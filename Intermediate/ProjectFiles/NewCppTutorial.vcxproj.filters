@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\..\NewCppTutorial.uproject" />
+    <Filter Include="Source">
+      <UniqueIdentifier>{F31BBDD1-B3E8-3BCC-9652-680E16935819}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\NewCppTutorial.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\NewCppTutorialEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <Filter Include="Config">
+      <UniqueIdentifier>{FA535FFB-25E1-3D20-B416-52F9BE21E06E}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\DefaultEditor.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEngine.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGame.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGameplayTags.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultInput.ini">
+      <Filter>Config</Filter>
+    </None>
+    <Filter Include="Source\NewCppTutorialEditor">
+      <UniqueIdentifier>{147C2DD2-8203-3BEC-9C17-A8546A044FE6}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\NewCppTutorialEditor\MoveComponentVisualizer.cpp">
+      <Filter>Source\NewCppTutorialEditor</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\NewCppTutorialEditor\MoveComponentVisualizer.h">
+      <Filter>Source\NewCppTutorialEditor</Filter>
+    </ClInclude>
+    <None Include="..\..\Source\NewCppTutorialEditor\NewCppTutorialEditor.Build.cs">
+      <Filter>Source\NewCppTutorialEditor</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\NewCppTutorialEditor\NewCppTutorialEditor.cpp">
+      <Filter>Source\NewCppTutorialEditor</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\NewCppTutorialEditor\NewCppTutorialEditor.h">
+      <Filter>Source\NewCppTutorialEditor</Filter>
+    </ClInclude>
+    <Filter Include="Source\NewCppTutorial">
+      <UniqueIdentifier>{3F113E0F-9CAB-3519-B570-FBE2BDDF4638}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\NewCppTutorial\CustomCharacter.cpp">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\NewCppTutorial\CustomCharacter.h">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\NewCppTutorial\CustomMoveComponent.cpp">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\NewCppTutorial\CustomMoveComponent.h">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\NewCppTutorial\CustomMovementComponent.h">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\NewCppTutorial\MoveComponent.cpp">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\NewCppTutorial\MoveComponent.h">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\NewCppTutorial\MyCollectableActor.cpp">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\NewCppTutorial\MyCollectableActor.h">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\NewCppTutorial\MyCollectAcceptable.cpp">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\NewCppTutorial\MyCollectAcceptable.h">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\NewCppTutorial\NewCppTuitorialGameModeBase.cpp">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\NewCppTutorial\NewCppTuitorialGameModeBase.h">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClInclude>
+    <None Include="..\..\Source\NewCppTutorial\NewCppTutorial.Build.cs">
+      <Filter>Source\NewCppTutorial</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\NewCppTutorial\NewCppTutorial.cpp">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\NewCppTutorial\NewCppTutorial.h">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\NewCppTutorial\SpawnBox.cpp">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\NewCppTutorial\SpawnBox.h">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\NewCppTutorial\XpCharacter.cpp">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\NewCppTutorial\XpCharacter.h">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\NewCppTutorial\XpPawn.cpp">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\NewCppTutorial\XpPawn.h">
+      <Filter>Source\NewCppTutorial</Filter>
+    </ClInclude>
+    <Filter Include="Source\NewCppTutorial\Private">
+      <UniqueIdentifier>{A5D3FE38-3533-3450-A1B2-DFF0C4566FF8}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\NewCppTutorial\Private\GamePlayTagDefinitions.cpp">
+      <Filter>Source\NewCppTutorial\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\NewCppTutorial\Private\RailGrindRails.cpp">
+      <Filter>Source\NewCppTutorial\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\NewCppTutorial\Private\WallRunWall.cpp">
+      <Filter>Source\NewCppTutorial\Private</Filter>
+    </ClCompile>
+    <Filter Include="Source\NewCppTutorial\Public">
+      <UniqueIdentifier>{B5A88786-950C-3373-AE85-C202BA63E227}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Source\NewCppTutorial\Public\GamePlayTagDefinitions.h">
+      <Filter>Source\NewCppTutorial\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\NewCppTutorial\Public\RailGrindRails.h">
+      <Filter>Source\NewCppTutorial\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\NewCppTutorial\Public\WallRunWall.h">
+      <Filter>Source\NewCppTutorial\Public</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

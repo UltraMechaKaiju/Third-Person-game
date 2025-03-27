@@ -1,0 +1,28 @@
+{
+	"version": 1,
+	"changelists": [
+		{
+			"guid": "00000000000000000000000000000000",
+			"description": "Default Uncontrolled Changelist",
+			"files": [
+				"D:/Unreal engine/NewCppTutorial/Content/StarterContent/Architecture/Floor_400x400.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/BluePrints/MyXpCharacter.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/1/U4/88J59PZHJLZXXQMTLUSVI6.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/C/4F/9Z0S8JFWC3IMALCSJMWKE8.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/8/QK/7M88799GKBAZKGV0GTSN31.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/C/L0/3ZSRWCM1GZ007N39P7523R.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/B/MU/Q6962OGUHJBSNZN16ABYOQ.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/Scenes/DefaultScene.umap",
+				"D:/Unreal engine/NewCppTutorial/Content/BluePrints/BP_RailGrindRails.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/8/BB/QKN7ONONK1WG0755AZOZOW.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/E/QJ/PMT7K9USXMCDOOPZXRK3ZY.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/9/GX/MAYMTSIC9ZO466UO2G1HF3.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/2/AP/TNUQSYVQRZOMYUL0NGO624.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/5/Q8/39DGAE8IHL9TU19YJLZJVP.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/1/JV/5VMVSXMZVOEUBFMS6CFRMD.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/StarterContent/Materials/M_Basic_Wall.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/Mesh/Pipe_SM.uasset"
+			]
+		}
+	]
+}

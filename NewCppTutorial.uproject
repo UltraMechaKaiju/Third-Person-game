@@ -1,0 +1,30 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{E095AA08-4B3E-B1CB-3AD6-9F8D7F6E4571}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "NewCppTutorial",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
+		},
+		{
+			"Name": "NewCppTutorialEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ModelingToolsEditorMode",
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
+		}
+	]
+}

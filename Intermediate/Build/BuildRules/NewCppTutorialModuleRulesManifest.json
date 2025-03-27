@@ -1,0 +1,9 @@
+{
+	"SourceFiles": [
+		"D:\\Unreal engine\\NewCppTutorial\\Source\\NewCppTutorialEditor\\NewCppTutorialEditor.Build.cs",
+		"D:\\Unreal engine\\NewCppTutorial\\Source\\NewCppTutorial\\NewCppTutorial.Build.cs",
+		"D:\\Unreal engine\\NewCppTutorial\\Source\\NewCppTutorial.Target.cs",
+		"D:\\Unreal engine\\NewCppTutorial\\Source\\NewCppTutorialEditor.Target.cs"
+	],
+	"EngineVersion": "5.3.2"
+}
