@@ -26,7 +26,6 @@ AXpCharacter::AXpCharacter(const FObjectInitializer& ObjectInitializer)
 
 	Springarm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	Springarm->SetupAttachment(GetCapsuleComponent());
-	
 	Springarm->SocketOffset.Z = 75;
 	Springarm->bUsePawnControlRotation = true;
 	Springarm->bInheritPitch = true;

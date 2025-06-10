@@ -30,8 +30,12 @@ class NEWCPPTUTORIAL_API UCustomMoveComponent : public UCharacterMovementCompone
 	{
 		typedef FSavedMove_Character Super;
 
-		uint8 saved_bCanRailGrind : 1;
+		//custom variables
+		//uint32 Saved_GrindRailUId;
+		
 
+		//custom flags
+		uint8 saved_bCanRailGrind : 1;
 		uint8 Saved_bWallRunRight : 1;
 
 		virtual bool CanCombineWith(const FSavedMovePtr& NewMove, ACharacter* InCharacter, float MaxDelta) const override;
@@ -72,6 +76,9 @@ class NEWCPPTUTORIAL_API UCustomMoveComponent : public UCharacterMovementCompone
 
 	bool safe_bCanRailGrind;
 	bool safe_bWallRunRight;
+
+	//client suide variables
+	//uint32 Safe_GrindRailUId;
 
 	UStaticMeshComponent* RailGrindStaticMesh;
 	

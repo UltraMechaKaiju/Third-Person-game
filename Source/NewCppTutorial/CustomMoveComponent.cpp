@@ -14,7 +14,112 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+#pragma region constants
+namespace CharacterMovementConstants {
+	const float VERTICAL_SLOPE_NORMAL_Z = 0.001f;
+}
 
+namespace CharacterMovementCVars {
+	int32 ForceJumpPeakSubstep = 1;
+	int32 UseTargetVelocityOnImpact = 1;
+}
+#pragma endregion
+
+#pragma region SavedMove
+bool UCustomMoveComponent::FSavedMove_Custom::CanCombineWith(const FSavedMovePtr& NewMove, ACharacter* InCharacter, float MaxDelta) const
+{
+	FSavedMove_Custom* NewSavedMove = static_cast<FSavedMove_Custom*>(NewMove.Get());
+
+	if (saved_bCanRailGrind != NewSavedMove->saved_bCanRailGrind
+	|| Saved_bWallRunRight != NewSavedMove->Saved_bWallRunRight
+	/*|| Saved_GrindRailUId != NewSavedMove->Saved_GrindRailUId*/) {
+		return false;
+	}
+
+	return Super::CanCombineWith(NewMove, InCharacter, MaxDelta);
+}
+
+void UCustomMoveComponent::FSavedMove_Custom::Clear()
+{
+
+	FSavedMove_Character::Clear();
+
+	saved_bCanRailGrind = 0;
+
+	Saved_bWallRunRight = 0;
+
+	/*Saved_GrindRailUId = 0;*/
+}
+
+uint8 UCustomMoveComponent::FSavedMove_Custom::GetCompressedFlags() const
+{
+	uint8 Result = Super::GetCompressedFlags();
+
+	if (saved_bCanRailGrind) Result |= FLAG_Custom_0;
+	if (Saved_bWallRunRight) Result |= FLAG_Custom_1;
+
+	return Result;
+}
+
+void UCustomMoveComponent::FSavedMove_Custom::SetMoveFor(ACharacter* C, float InDeltaTime, FVector const& NewAccel, FNetworkPredictionData_Client_Character& ClientData)
+{
+	FSavedMove_Character::SetMoveFor(C, InDeltaTime, NewAccel, ClientData);
+
+	UCustomMoveComponent* CharacterMovementComp = Cast<UCustomMoveComponent>(C->GetCharacterMovement());
+	//Custom Variables
+	//Saved_GrindRailUId = CharacterMovementComp->Safe_GrindRailUId;
+
+	//Custom Flags
+	saved_bCanRailGrind = CharacterMovementComp->safe_bCanRailGrind;
+	Saved_bWallRunRight = CharacterMovementComp->safe_bWallRunRight;
+}
+
+void UCustomMoveComponent::FSavedMove_Custom::PrepMoveFor(ACharacter* C)
+{
+	Super::PrepMoveFor(C);
+
+	UCustomMoveComponent* CharacterMovementComp = Cast<UCustomMoveComponent>(C->GetCharacterMovement());
+	//custom variables
+	//CharacterMovementComp->Safe_GrindRailUId = Saved_GrindRailUId;
+
+	//custom flags
+	CharacterMovementComp->safe_bCanRailGrind = saved_bCanRailGrind;
+	CharacterMovementComp->safe_bWallRunRight = Saved_bWallRunRight;
+}
+#pragma endregion
+
+
+#pragma region Client Network Prediction Data
+UCustomMoveComponent::FNetworkPredictionData_Client_Custom::FNetworkPredictionData_Client_Custom(const UCharacterMovementComponent& ClientMovement)
+	: Super(ClientMovement)
+{
+}
+
+FSavedMovePtr UCustomMoveComponent::FNetworkPredictionData_Client_Custom::AllocateNewMove()
+{
+	return FSavedMovePtr(new FSavedMove_Custom());
+}
+#pragma endregion
+
+UCustomMoveComponent::UCustomMoveComponent()
+{
+	//set variables in here like NavAgentProps.bCanCrouch = true;
+}
+
+#pragma region CMC
+void UCustomMoveComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+	CustomCharacterOwner = Cast<AXpCharacter>(GetOwner());
+}
+
+void UCustomMoveComponent::UpdateFromCompressedFlags(uint8 Flags)
+{
+	Super::UpdateFromCompressedFlags(Flags);
+
+	safe_bWallRunRight = (Flags & FSavedMove_Character::FLAG_Custom_0) != 0;
+	safe_bCanRailGrind = (Flags & FSavedMove_Character::FLAG_Custom_1) != 0;
+}
 
 FNetworkPredictionData_Client* UCustomMoveComponent::GetPredictionData_Client() const
 {
@@ -25,28 +130,129 @@ FNetworkPredictionData_Client* UCustomMoveComponent::GetPredictionData_Client() 
 			MutableThis->ClientPredictionData = new FNetworkPredictionData_Client_Custom(*this);
 			MutableThis->ClientPredictionData->MaxSmoothNetUpdateDist = 92.f;
 			MutableThis->ClientPredictionData->NoSmoothNetUpdateDist = 140.f;
-	}
+		}
 	return ClientPredictionData;
 }
 
-UCustomMoveComponent::UCustomMoveComponent()
+float UCustomMoveComponent::GetMaxSpeed() const
 {
+	if (MovementMode != MOVE_Custom) return Super::GetMaxSpeed();
+
+	switch (CustomMovementMode)
+	{
+	case CMOVE_WallRun:
+		return MaxWallRunSpeed;
+	case CMOVE_RailGrind:
+		return 0;
+	default:
+		UE_LOG(LogTemp, Fatal, TEXT("InvalidMovementMode"))
+			return -1.f;
+	}
+}
+float UCustomMoveComponent::GetMaxBrakingDeceleration() const {
+	if (MovementMode != MOVE_Custom) return Super::GetMaxBrakingDeceleration();
+
+	switch (CustomMovementMode)
+	{
+	case CMOVE_WallRun:
+		return 0.f;
+	default:
+		UE_LOG(LogTemp, Fatal, TEXT("InvalidMovementMode"))
+			return -1.f;
+	}
 }
 
-
-UCustomMoveComponent::FNetworkPredictionData_Client_Custom::FNetworkPredictionData_Client_Custom(const UCharacterMovementComponent& ClientMovement) : Super(ClientMovement)
+//Jumping
+bool UCustomMoveComponent::CanAttemptJump() const
 {
+	return Super::CanAttemptJump() || IsWallRunning();
 }
 
+bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
+{
+	bool bWasWallRunning = IsWallRunning();
+	bool bWasRailGrinding = IsRailGrinding();
+	if (Super::DoJump(bReplayingMoves)) {
+		if (bWasWallRunning) {
+			FVector Start = UpdatedComponent->GetComponentLocation();
+			FVector CastDelta = Velocity.RotateAngleAxis(90, FVector::UpVector) * CapR() * 2;
+			FVector End = safe_bWallRunRight ? Start + CastDelta : Start - CastDelta;
+			auto Params = CustomCharacterOwner->GetIgnoreCharacterParams();
+			FHitResult WallHit;
+			GetWorld()->LineTraceSingleByProfile(WallHit, Start, End, "BlockAll", Params);
 
-namespace CharacterMovementConstants {
-	const float VERTICAL_SLOPE_NORMAL_Z = 0.001f;
+			FVector JumpDir = safe_bWallRunRight ? Velocity.GetSafeNormal().RotateAngleAxis(270, FVector::UpVector) : Velocity.GetSafeNormal().RotateAngleAxis(90, FVector::UpVector);
+
+			WallJumpOffForce = Velocity.Size();
+
+			Velocity += JumpDir * WallJumpOffForce;
+
+			Velocity *= WallJumpOffForce / Velocity.Size();
+		}
+		if (bWasRailGrinding) {
+			safe_bCanRailGrind = false;
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
-namespace CharacterMovementCVars {
-	int32 ForceJumpPeakSubstep = 1;
-	int32 UseTargetVelocityOnImpact = 1;
+//Movement Pipeline
+void UCustomMoveComponent::UpdateCharacterStateBeforeMovement(float DeltaSeconds)
+{
+	if (IsWalking()) {
+		safe_bCanRailGrind = true;
+	}
+	if (IsFalling()) {
+		if (!TryWallRun()) {
+			//TryRailGrind();
+		}
+	}
+
+	Super::UpdateCharacterStateBeforeMovement(DeltaSeconds);
 }
+
+void UCustomMoveComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
+{
+	Super::OnMovementModeChanged(PreviousMovementMode, PreviousCustomMode);
+
+
+
+	if (IsWallRunning() && GetOwnerRole() == ROLE_SimulatedProxy)
+	{
+		FVector Start = UpdatedComponent->GetComponentLocation();
+		FVector End = Start + UpdatedComponent->GetRightVector() * 34 * 2;
+		auto Params = CustomCharacterOwner->GetIgnoreCharacterParams();
+		FHitResult WallHit;
+		safe_bWallRunRight = GetWorld()->LineTraceSingleByProfile(WallHit, Start, End, "BlockAll", Params);
+	}
+}
+void UCustomMoveComponent::PhysCustom(float deltaTime, int32 Iterations)
+{
+	Super::PhysCustom(deltaTime, Iterations);
+
+	switch (CustomMovementMode) {
+	case CMOVE_WallRun:
+		PhysWallRun(deltaTime, Iterations);
+		break;
+	case CMOVE_RailGrind:
+		PhysRailGrind(deltaTime, Iterations);
+		break;
+	default:
+		UE_LOG(LogTemp, Fatal, TEXT("InvalidMovementMode"))
+	}
+}
+
+void UCustomMoveComponent::OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity)
+{
+	//if (MovementMode = MOVE_Walking) {}
+}
+
+#pragma endregion
+
+
 
 #pragma region MovementModeFunctions
 void UCustomMoveComponent::SprintPressed()
@@ -60,12 +266,6 @@ void UCustomMoveComponent::SprintReleased()
 	//not movement safe implementation: walk speed is not changed in the phys walk function, it is changed client side in the second line, phys walk would have to be overridden to fix this
 	safe_bCanRailGrind = false;
 	MaxWalkSpeed = Walk_MaxSpeed;
-}
-
-void UCustomMoveComponent::InitializeComponent()
-{
-	Super::InitializeComponent();
-	CustomCharacterOwner = Cast<AXpCharacter>(GetOwner());
 }
 
 bool UCustomMoveComponent::IsVelocityTowardsWall(FHitResult WallToCheck)
@@ -314,7 +514,6 @@ bool UCustomMoveComponent::TryWallRun()
 
 	*/
 
-#pragma endregion
 	//set direction
 
 	//check if set velocity passes checks
@@ -340,6 +539,8 @@ bool UCustomMoveComponent::TryWallRun()
 	//UE_LOG(LogTemp, Warning, TEXT("Wall Run set"))
 	return true;
 }
+
+#pragma endregion
 
 bool UCustomMoveComponent::TryRailGrind(){
 	if ((CustomCharacterOwner->GetRailGrindHitBoxOverlapped()).Num() >= 1.f) {
@@ -383,187 +584,6 @@ float UCustomMoveComponent::CapHH() const{
 }
 float UCustomMoveComponent::CapR() const{
 	return CharacterOwner->GetCapsuleComponent()->GetScaledCapsuleRadius();
-}
-#pragma endregion
-#pragma region CMCFunctions
-void UCustomMoveComponent::OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity)
-{
-	//if (MovementMode = MOVE_Walking) {}
-}
-
-void UCustomMoveComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
-{
-	Super::OnMovementModeChanged(PreviousMovementMode, PreviousCustomMode);
-
-
-
-	if (IsWallRunning() && GetOwnerRole() == ROLE_SimulatedProxy)
-	{
-		FVector Start = UpdatedComponent->GetComponentLocation();
-		FVector End = Start + UpdatedComponent->GetRightVector() * 34 * 2;
-		auto Params = CustomCharacterOwner->GetIgnoreCharacterParams();
-		FHitResult WallHit;
-		safe_bWallRunRight = GetWorld()->LineTraceSingleByProfile(WallHit, Start, End, "BlockAll", Params);
-	}
-}
-
-void UCustomMoveComponent::UpdateCharacterStateBeforeMovement(float DeltaSeconds)
-{
-	if (IsFalling() && !IsWallRunning()) {
-		if (!TryWallRun()) {
-			TryRailGrind();
-		}
-	}
-
-	Super::UpdateCharacterStateBeforeMovement(DeltaSeconds);
-}
-
-void UCustomMoveComponent::PhysCustom(float deltaTime, int32 Iterations)
-{
-	Super::PhysCustom(deltaTime, Iterations);
-
-	switch (CustomMovementMode) {
-	case CMOVE_WallRun:
-		PhysWallRun(deltaTime, Iterations);
-		break;
-	case CMOVE_RailGrind:
-		PhysRailGrind(deltaTime, Iterations);
-		break;
-	default:
-		UE_LOG(LogTemp, Fatal, TEXT("InvalidMovementMode"))
-	}
-}
-
-FSavedMovePtr UCustomMoveComponent::FNetworkPredictionData_Client_Custom::AllocateNewMove()
-{
-	return FSavedMovePtr(new FSavedMove_Custom());
-}
-
-#pragma region Jumping
-bool UCustomMoveComponent::CanAttemptJump() const
-{
-	return Super::CanAttemptJump() || IsWallRunning();
-}
-
-bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
-{
-	bool bWasWallRunning = IsWallRunning();
-	bool bWasRailGrinding = IsRailGrinding();
-	if (Super::DoJump(bReplayingMoves)) {
-		if (bWasWallRunning) {
-			FVector Start = UpdatedComponent->GetComponentLocation();
-			FVector CastDelta = Velocity.RotateAngleAxis(90, FVector::UpVector) * CapR() * 2;
-			FVector End = safe_bWallRunRight ? Start + CastDelta : Start - CastDelta;
-			auto Params = CustomCharacterOwner->GetIgnoreCharacterParams();
-			FHitResult WallHit;
-			GetWorld()->LineTraceSingleByProfile(WallHit, Start, End, "BlockAll", Params);
-
-			FVector JumpDir = safe_bWallRunRight ? Velocity.GetSafeNormal().RotateAngleAxis(270, FVector::UpVector): Velocity.GetSafeNormal().RotateAngleAxis(90, FVector::UpVector);
-
-			WallJumpOffForce = Velocity.Size();
-
-			Velocity += JumpDir * WallJumpOffForce;
-
-			Velocity *= WallJumpOffForce/Velocity.Size();
-		}
-		if (bWasRailGrinding) {
-			safe_bCanRailGrind = false;
-		}
-
-		return true;
-	}
-
-	return false;
-}
-#pragma endregion
-float UCustomMoveComponent::GetMaxSpeed() const
-{
-	if (MovementMode != MOVE_Custom) return Super::GetMaxSpeed();
-
-	switch (CustomMovementMode)
-	{
-	case CMOVE_WallRun:
-		return MaxWallRunSpeed;
-	default:
-		UE_LOG(LogTemp, Fatal, TEXT("InvalidMovementMode"))
-		return -1.f;
-	}
-
-}
-
-float UCustomMoveComponent::GetMaxBrakingDeceleration() const {
-	if (MovementMode != MOVE_Custom) return Super::GetMaxBrakingDeceleration();
-
-	switch (CustomMovementMode)
-	{
-	case CMOVE_WallRun:
-		return 0.f;
-	default:
-		UE_LOG(LogTemp, Fatal, TEXT("InvalidMovementMode"))
-		return -1.f;
-	}
-}
-
-#pragma endregion
-
-#pragma region FlagFunctions
-void UCustomMoveComponent::UpdateFromCompressedFlags(uint8 Flags)
-{
-	Super::UpdateFromCompressedFlags(Flags);
-
-	safe_bWallRunRight = (Flags & FSavedMove_Character::FLAG_Custom_0) != 0;
-	safe_bCanRailGrind = (Flags & FSavedMove_Character::FLAG_Custom_1) != 0;
-}
-
-bool UCustomMoveComponent::FSavedMove_Custom::CanCombineWith(const FSavedMovePtr& NewMove, ACharacter* InCharacter, float MaxDelta) const
-{
-	FSavedMove_Custom* NewSavedMove = static_cast<FSavedMove_Custom*>(NewMove.Get());
-
-	if (saved_bCanRailGrind != NewSavedMove->saved_bCanRailGrind || Saved_bWallRunRight != NewSavedMove->Saved_bWallRunRight) {
-		return false;
-	}
-	
-	return Super::CanCombineWith(NewMove, InCharacter, MaxDelta);
-}
-
-void UCustomMoveComponent::FSavedMove_Custom::Clear()
-{
-
-	FSavedMove_Character::Clear();
-
-	saved_bCanRailGrind = 0;
-
-	Saved_bWallRunRight = 0;
-}
-
-uint8 UCustomMoveComponent::FSavedMove_Custom::GetCompressedFlags() const
-{
-	uint8 Result = Super::GetCompressedFlags();
-
-	if (saved_bCanRailGrind) Result |= FLAG_Custom_0;
-	if (Saved_bWallRunRight) Result |= FLAG_Custom_1;
-
-	return Result;
-}
-
-void UCustomMoveComponent::FSavedMove_Custom::SetMoveFor(ACharacter* C, float InDeltaTime, FVector const& NewAccel, FNetworkPredictionData_Client_Character& ClientData)
-{
-	FSavedMove_Character::SetMoveFor(C, InDeltaTime, NewAccel, ClientData);
-
-	UCustomMoveComponent* CharacterMovementComp = Cast<UCustomMoveComponent>(C->GetCharacterMovement());
-
-	saved_bCanRailGrind = CharacterMovementComp->safe_bCanRailGrind;
-	Saved_bWallRunRight = CharacterMovementComp->safe_bWallRunRight;
-}
-
-void UCustomMoveComponent::FSavedMove_Custom::PrepMoveFor(ACharacter* C)
-{
-	Super::PrepMoveFor(C);
-
-	UCustomMoveComponent* CharacterMovementComp = Cast<UCustomMoveComponent>(C->GetCharacterMovement());
-
-	CharacterMovementComp->safe_bCanRailGrind = saved_bCanRailGrind;
-	CharacterMovementComp->safe_bWallRunRight = Saved_bWallRunRight;
 }
 #pragma endregion
 
@@ -883,41 +903,59 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 		ARailGrindRails* SelectedRail = nullptr;
 		USplineComponent* SelectedSpline = nullptr;
 		float SelectedRailDistFrom;
-		float SelectedRailDistAlong;
-		FVector SelectedRailLocation;
+		float SelectedRailDistAlongStart;
+		float SelectedRailDistAlongFinal;
+		float SelectedRailDistAlongFinalClamped;
+		FVector SelectedRailClosestLocation;
+		FVector CapsuleSplineDelta;
 		float SplineEndDistance;
-		FVector FootLocation = UpdatedComponent->GetComponentLocation() - FVector(0, 0, CapHH());
+		FVector CapsuleBottomExt = UpdatedComponent->GetComponentLocation() - FVector(0, 0, CapHH());
 		FHitResult RailGrindHit;
 		TArray<AActor*> DetectedGrindRails = CustomCharacterOwner->GetRailGrindHitBoxOverlapped();
 
-		if (DetectedGrindRails.Num() <= 0) {
+		if (DetectedGrindRails.Num() == 0) {
 			SetMovementMode(MOVE_Falling);
-			StartNewPhysics(RemainingTime, Iterations);
-			break;
+			StartNewPhysics(RemainingTime + timeTick, Iterations);
+			UE_LOG(LogTemp, Warning, TEXT("Rail Grinding was initiated, but no rails were detected"))
+				return;
 		}
+		
+		SelectedRail = Cast<ARailGrindRails>(DetectedGrindRails[0]);
+		//look at all the rails and pick the closest one, starting from the second rail, as the first rail is chosen as the one to be compared against
+		for (int i = 1; i < DetectedGrindRails.Num(); i++) {
+			ARailGrindRails* CompareRail = Cast<ARailGrindRails>(DetectedGrindRails[i]);
+			int CompareRailDist = (CapsuleBottomExt - CompareRail->GetGrindSplineClosestLocation(CapsuleBottomExt)).Length();
+			int SelectedRailDist = (CapsuleBottomExt - SelectedRail->GetGrindSplineClosestLocation(CapsuleBottomExt)).Length();
+			if (SelectedRailDist > CompareRailDist) {
+				SelectedRail = Cast<ARailGrindRails>(CompareRail);
 
-		for (size_t i = 0; i < DetectedGrindRails.Num() - 1; i++){
-			ARailGrindRails* CurrentRail = Cast<ARailGrindRails>(DetectedGrindRails[i]);
-			FVector ClosestOnSplineWorld = CurrentRail->GetGrindSplineClosestLocation(FootLocation);
-			float CurrentRailDist = FMath::Abs((ClosestOnSplineWorld - FootLocation).Size());
-			if (SelectedRail == nullptr || SelectedRailDistFrom > CurrentRailDist) {
-				SelectedRail = CurrentRail;
-				SelectedRailLocation = SelectedRail->GetGrindSplineClosestLocation(FootLocation);
-				SelectedRailDistFrom = CurrentRailDist;
+				//Define Variables
+				SelectedRailDistFrom = (CapsuleBottomExt - SelectedRail->GetGrindSplineClosestLocation(CapsuleBottomExt)).Length();
+				SelectedRailClosestLocation = SelectedRail->GetGrindSplineClosestLocation(CapsuleBottomExt);
+				CapsuleSplineDelta = (SelectedRail->GetGrindSplineClosestLocation(CapsuleBottomExt) - CapsuleBottomExt);
 				SelectedSpline = SelectedRail->GrindRail;
-				SelectedRailDistAlong = SelectedSpline->GetDistanceAlongSplineAtLocation(SelectedRailLocation, ESplineCoordinateSpace::World);
-				SplineEndDistance = SelectedSpline->GetDistanceAlongSplineAtSplinePoint((SelectedSpline->GetNumberOfSplinePoints()) - 1);
+				SelectedRailDistAlongStart = SelectedSpline->GetDistanceAlongSplineAtLocation(SelectedRailClosestLocation, ESplineCoordinateSpace::World);
+				SplineEndDistance = SelectedSpline->GetSplineLength();
 			}
 		}
+		//RailHasBeen Selected
+		//If the player is far from the rail, Take into account the distance from the rail 
+		/*if (SelectedRailDistFrom >= UE_KINDA_SMALL_NUMBER) {
+			SafeMoveUpdatedComponent(CapsuleSplineDelta, UpdatedComponent->GetComponentQuat(), false, RailGrindHit);
+			SelectedRailDistAlongFinal -= SelectedRailDistFrom;
+		}*/
+
+
 		//Determine Direction To move for when you are moving and when you have no XY plane velocity
 		FVector ForwardToBeUsed = FVector::ZeroVector;
 		if (Velocity.GetSafeNormal2D() == FVector::ZeroVector) {
-			ForwardToBeUsed = CustomCharacterOwner->GetCameraDirection();
+			ForwardToBeUsed = (UpdatedComponent->GetComponentQuat()*FVector::ForwardVector).GetSafeNormal2D();
 		}
 		else {
 			ForwardToBeUsed = Velocity.GetSafeNormal2D();
 		}
-		FVector SplineForward = SelectedSpline->GetDirectionAtDistanceAlongSpline(SelectedRailDistAlong, ESplineCoordinateSpace::World);
+
+		FVector SplineForward = SelectedSpline->GetDirectionAtDistanceAlongSpline(SelectedRailDistAlongStart, ESplineCoordinateSpace::World);
 		int DirectionModifier;
 
 		if ((FMath::Acos(FVector::DotProduct(ForwardToBeUsed, SplineForward))) > (PI / 2)) {
@@ -926,39 +964,37 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 		else {
 			DirectionModifier = 1;
 		}
+
+		//Calculate the final distance along the rail after movement
+		SelectedRailDistAlongFinal = ((SelectedSpline->GetDistanceAlongSplineAtLocation(SelectedRailClosestLocation, ESplineCoordinateSpace::World)) + Velocity.Length()) * DirectionModifier;
+		SelectedRailDistAlongFinalClamped = FMath::Clamp(((SelectedSpline->GetDistanceAlongSplineAtLocation(SelectedRailClosestLocation, ESplineCoordinateSpace::World)) + Velocity.Length()) * DirectionModifier,0,SplineEndDistance);
+		FVector SelectedRailDistAlongFinalClampedLoction = SelectedSpline->GetLocationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
+		FVector MoveDelta = SelectedRailDistAlongFinalClampedLoction - CapsuleBottomExt;
+		float SelectedRailDistAlongFinalDelta = SelectedRailDistAlongFinal - SelectedRailDistAlongFinalClamped;
+		float PercentOfTimeUsed = SelectedRailDistAlongFinalClamped / SelectedRailDistAlongFinal;
+
 		//Check if closest point is the end of the rail i.e you will immediately fall off and if so abort
-		if (DirectionModifier == 1 && (SelectedRailDistAlong == SplineEndDistance) || DirectionModifier == -1 && (SelectedRailDistAlong == 0.f)) {
+		if (DirectionModifier == 1 && (SelectedRailDistAlongStart == SplineEndDistance) || DirectionModifier == -1 && (SelectedRailDistAlongStart == 0.f)) {
 			SetMovementMode(MOVE_Falling);
-			StartNewPhysics(RemainingTime, Iterations);
+			StartNewPhysics(RemainingTime+timeTick, Iterations);
 			return;
 		}
-		 
-		//Preform movemnt to rail if not on rail and are moving fast enough to cover the distance, else abort
-		if (Velocity.Size() > SelectedRailDistFrom) {
-			SafeMoveUpdatedComponent(((FootLocation - SelectedRailLocation) - FootLocation), UpdatedComponent->GetComponentQuat(), true, RailGrindHit);
-		}
-		else {
+
+		//We have everything we need to move, so do the move
+		SafeMoveUpdatedComponent(MoveDelta, UpdatedComponent->GetComponentQuat(), true, RailGrindHit);
+
+		//Update Variables
+		Velocity = (SelectedSpline->GetDirectionAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World)) * Velocity.Length();
+
+
+		//Do we have to fall off??
+
+		if (DirectionModifier == 1 && (SelectedRailDistAlongFinal > SplineEndDistance) || DirectionModifier == -1 && (SelectedRailDistAlongFinal < 0.f)) {
 			SetMovementMode(MOVE_Falling);
-			StartNewPhysics(RemainingTime, Iterations);
+			safe_bCanRailGrind = false;
+			StartNewPhysics(RemainingTime + timeTick - (timeTick * PercentOfTimeUsed), Iterations);
 			return;
 		}
-		//DetermineNextLocationInWorldSpaceOfNextDistanceAlongSpline
-		FootLocation = UpdatedComponent->GetComponentLocation() - FVector(0, 0, CapHH());
-		float NextDistanceAlongRail = SelectedSpline->GetDistanceAlongSplineAtLocation(FootLocation, ESplineCoordinateSpace::World) + (Velocity.Size() * timeTick * DirectionModifier);
-		
-		if (DirectionModifier == 1 && NextDistanceAlongRail > SplineEndDistance) {
-			//if true, move to end of rail, fall off and start new physics making sure not to subtract the full timeTick since we have moved for less distance than we have velocity
-			NextDistanceAlongRail = SplineEndDistance;
-		}
-		if (DirectionModifier == -1 && NextDistanceAlongRail < 0) {
-			//if true, move to start of rail, fall off and start new physics making sure not to subtract the full timeTick since we have moved for less distance than we have velocity
-			NextDistanceAlongRail = 0;
-		}
-		FVector NextIterationLocation(SelectedSpline->GetLocationAtDistanceAlongSpline(NextDistanceAlongRail, ESplineCoordinateSpace::World));
-		FVector NextIterationDelta = FootLocation - NextIterationLocation;
-
-		SafeMoveUpdatedComponent(NextIterationDelta, UpdatedComponent->GetComponentQuat(), true, RailGrindHit);
-
 	}
 }
 
@@ -1461,6 +1497,19 @@ void UCustomMoveComponent::PhysFalling(float deltaTime, int32 Iterations)
 		}
 		else if (Hit.bBlockingHit)
 		{
+			//custom
+			if (Cast<ARailGrindRails>(Hit.GetActor())) {
+				FHitResult CustomHit;
+				FVector startLoc = UpdatedComponent->GetComponentLocation()+(FVector(0,0,-CapHH()));
+				FVector EndLoc = startLoc + FVector(0,0,-MAX_FLOOR_DIST);
+				FCollisionShape CollisionShape;
+				CollisionShape.MakeSphere(CapR());
+				GetWorld()->SweepSingleByProfile(CustomHit, startLoc, EndLoc, UpdatedComponent->GetComponentQuat(), "BlockAll", CollisionShape);
+				SetMovementMode(MOVE_Custom, CMOVE_RailGrind);
+				StartNewPhysics(remainingTime, Iterations);
+				return;
+			}
+			//custom
 			if (IsValidLandingSpot(UpdatedComponent->GetComponentLocation(), Hit))
 			{
 				remainingTime += subTimeTickRemaining;
