@@ -2,7 +2,7 @@
 	"BuildId": "27405482",
 	"Modules": 
 	{
-		"NewCppTutorial": "UnrealEditor-NewCppTutorial.dll",
-		"NewCppTutorialEditor": "UnrealEditor-NewCppTutorialEditor.dll"
+		"NewCppTutorial": "UnrealEditor-NewCppTutorial-4019.dll",
+		"NewCppTutorialEditor": "UnrealEditor-NewCppTutorialEditor-0015.dll"
 	}
 }

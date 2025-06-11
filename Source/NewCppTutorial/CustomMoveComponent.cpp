@@ -13,6 +13,7 @@
 #include "XpCharacter.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 #pragma region constants
 namespace CharacterMovementConstants {
@@ -1497,19 +1498,29 @@ void UCustomMoveComponent::PhysFalling(float deltaTime, int32 Iterations)
 		}
 		else if (Hit.bBlockingHit)
 		{
-			//custom
+			//custom Start
 			if (Cast<ARailGrindRails>(Hit.GetActor())) {
+				UE_LOG(LogTemp, Warning, TEXT("Looked For Rail"))
 				FHitResult CustomHit;
-				FVector startLoc = UpdatedComponent->GetComponentLocation()+(FVector(0,0,-CapHH()));
+				FVector startLoc = UpdatedComponent->GetComponentLocation()+(FVector(0,0,-CapHH()+CapR()));
 				FVector EndLoc = startLoc + FVector(0,0,-MAX_FLOOR_DIST);
 				FCollisionShape CollisionShape;
 				CollisionShape.MakeSphere(CapR());
-				GetWorld()->SweepSingleByProfile(CustomHit, startLoc, EndLoc, UpdatedComponent->GetComponentQuat(), "BlockAll", CollisionShape);
-				SetMovementMode(MOVE_Custom, CMOVE_RailGrind);
-				StartNewPhysics(remainingTime, Iterations);
-				return;
+				FCollisionObjectQueryParams ObjectTypes;
+				ObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_EngineTraceChannel1);
+				TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesArray;
+				ObjectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
+				TArray <AActor*> IgnoredActors;
+				DrawDebugLine(GetWorld(), startLoc, EndLoc, FColor::Green, true, 1 / 60);
+				//UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), startLoc, EndLoc, CapR(), ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::Type::ForDuration, CustomHit, false, FColor::Red, FColor::Green, 1000);
+				if (UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), startLoc, EndLoc, CapR(), ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::Type::ForDuration, CustomHit, false, FColor::Red, FColor::Green, 1000)) {
+					SetMovementMode(MOVE_Custom, CMOVE_RailGrind);
+					StartNewPhysics(remainingTime, Iterations);
+					UE_LOG(LogTemp, Warning, TEXT("FoundRail"))
+					return;
+				}
 			}
-			//custom
+			//custom End
 			if (IsValidLandingSpot(UpdatedComponent->GetComponentLocation(), Hit))
 			{
 				remainingTime += subTimeTickRemaining;
