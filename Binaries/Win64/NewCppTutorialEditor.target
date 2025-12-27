@@ -50,26 +50,6 @@
 			"Type": "RequiredResource"
 		},
 		{
-			"Path": "$(EngineDir)/Binaries/Win64/IOS/UnrealEditor-IOSPlatformEditor.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(EngineDir)/Binaries/Win64/IOS/UnrealEditor-IOSRuntimeSettings.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(EngineDir)/Binaries/Win64/IOS/UnrealEditor-IOSTargetPlatform.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(EngineDir)/Binaries/Win64/IOS/UnrealEditor-TVOSTargetPlatform.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(EngineDir)/Binaries/Win64/IOS/UnrealEditor.modules",
-			"Type": "RequiredResource"
-		},
-		{
 			"Path": "$(EngineDir)/Binaries/Win64/OpenColorIO_2_2.dll",
 			"Type": "DynamicLibrary"
 		},
@@ -822,10 +802,6 @@
 			"Type": "DynamicLibrary"
 		},
 		{
-			"Path": "$(EngineDir)/Binaries/Win64/UnrealEditor-LaunchDaemonMessages.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
 			"Path": "$(EngineDir)/Binaries/Win64/UnrealEditor-LauncherPlatform.dll",
 			"Type": "DynamicLibrary"
 		},
@@ -883,10 +859,6 @@
 		},
 		{
 			"Path": "$(EngineDir)/Binaries/Win64/UnrealEditor-MRMesh.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(EngineDir)/Binaries/Win64/UnrealEditor-MacTargetPlatform.dll",
 			"Type": "DynamicLibrary"
 		},
 		{
@@ -991,10 +963,6 @@
 		},
 		{
 			"Path": "$(EngineDir)/Binaries/Win64/UnrealEditor-MessagingRpc.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(EngineDir)/Binaries/Win64/UnrealEditor-MetalShaderFormat.dll",
 			"Type": "DynamicLibrary"
 		},
 		{
@@ -2775,6 +2743,14 @@
 		},
 		{
 			"Path": "$(EngineDir)/Plugins/Interchange/Runtime/Binaries/Win64/UnrealEditor.modules",
+			"Type": "RequiredResource"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Marketplace/3Dconnexion/TDxUnrealEditor/Binaries/Win64/UnrealEditor-TDxUnrealEditor.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Marketplace/3Dconnexion/TDxUnrealEditor/Binaries/Win64/UnrealEditor.modules",
 			"Type": "RequiredResource"
 		},
 		{
@@ -24541,6 +24517,10 @@
 		},
 		{
 			"Path": "$(EngineDir)/Plugins/Interchange/Runtime/Interchange.uplugin",
+			"Type": "UFS"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Marketplace/3Dconnexion/TDxUnrealEditor/TDxUnrealEditor.uplugin",
 			"Type": "UFS"
 		},
 		{

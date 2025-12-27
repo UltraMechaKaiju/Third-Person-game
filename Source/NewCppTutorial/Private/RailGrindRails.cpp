@@ -10,6 +10,19 @@ ARailGrindRails::ARailGrindRails()
 	PrimaryActorTick.bCanEverTick = false;
 	GrindRail = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
 	RootComponent = GrindRail;
+
+	/*for (int i = 0; i < GrindRail->GetNumberOfSplinePoints() - 2; i++) {
+		SplineMeshSegments.Add(CreateDefaultSubobject<USplineMeshComponent>(TEXT("MeshUnit")));
+		SplineMeshSegments[i]->SetupAttachment(RootComponent);
+		FVector StartLocation;
+		FVector StartTangent;
+		FVector EndLocation;
+		FVector EndTangent;
+		GrindRail->GetLocationAndTangentAtSplinePoint(i,StartLocation,StartTangent, ESplineCoordinateSpace::World);
+		GrindRail->GetLocationAndTangentAtSplinePoint(i+1, EndLocation, EndTangent, ESplineCoordinateSpace::World);
+		SplineMeshSegments[i]->SetStartAndEnd(StartLocation,StartTangent,EndLocation,EndTangent);
+	}*/
+	
 }
 
 FVector ARailGrindRails::GetGrindSplineClosestLocation(FVector FootLocation)

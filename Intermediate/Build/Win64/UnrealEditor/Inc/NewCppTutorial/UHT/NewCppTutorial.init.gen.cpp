@@ -23,7 +23,7 @@ void EmptyLinkFunctionForGeneratedCodeNewCppTutorial_init() {}
 				SingletonFuncArray,
 				UE_ARRAY_COUNT(SingletonFuncArray),
 				PKG_CompiledIn | 0x00000000,
-				0x701DABEA,
+				0x2F31D53D,
 				0x2DCB0BD3,
 				METADATA_PARAMS(0, nullptr)
 			};
@@ -31,5 +31,5 @@ void EmptyLinkFunctionForGeneratedCodeNewCppTutorial_init() {}
 		}
 		return Z_Registration_Info_UPackage__Script_NewCppTutorial.OuterSingleton;
 	}
-	static FRegisterCompiledInInfo Z_CompiledInDeferPackage_UPackage__Script_NewCppTutorial(Z_Construct_UPackage__Script_NewCppTutorial, TEXT("/Script/NewCppTutorial"), Z_Registration_Info_UPackage__Script_NewCppTutorial, CONSTRUCT_RELOAD_VERSION_INFO(FPackageReloadVersionInfo, 0x701DABEA, 0x2DCB0BD3));
+	static FRegisterCompiledInInfo Z_CompiledInDeferPackage_UPackage__Script_NewCppTutorial(Z_Construct_UPackage__Script_NewCppTutorial, TEXT("/Script/NewCppTutorial"), Z_Registration_Info_UPackage__Script_NewCppTutorial, CONSTRUCT_RELOAD_VERSION_INFO(FPackageReloadVersionInfo, 0x2F31D53D, 0x2DCB0BD3));
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
