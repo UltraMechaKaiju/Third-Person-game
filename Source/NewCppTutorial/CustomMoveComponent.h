@@ -71,7 +71,7 @@ class NEWCPPTUTORIAL_API UCustomMoveComponent : public UCharacterMovementCompone
 	UPROPERTY(EditDefaultsOnly) float WallJumpOffForce = 200.f;
 	UPROPERTY(EditDefaultsOnly) float WallAttractionForce = 1000.f;
 	UPROPERTY(EditDefaultsOnly) UCurveFloat* WallRunGravityScaleCurve;
-	UPROPERTY(EditDefaultsOnly) UStaticMesh* ScanMesh;
+	UPROPERTY(EditDefaultsOnly) float RailGrindPulAwayAngleMax = 90;
 
 	//client side Flags
 

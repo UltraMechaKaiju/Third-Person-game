@@ -138,15 +138,15 @@ void EmptyLinkFunctionForGeneratedCodeMyCollectAcceptable() {}
 			O->ProcessEvent(Func, &Parms);
 		}
 	}
-	struct Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_MyCollectAcceptable_h_Statics
+	struct Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_MyCollectAcceptable_h_Statics
 	{
 		static const FClassRegisterCompiledInInfo ClassInfo[];
 	};
-	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_MyCollectAcceptable_h_Statics::ClassInfo[] = {
+	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_MyCollectAcceptable_h_Statics::ClassInfo[] = {
 		{ Z_Construct_UClass_UMyCollectAcceptable, UMyCollectAcceptable::StaticClass, TEXT("UMyCollectAcceptable"), &Z_Registration_Info_UClass_UMyCollectAcceptable, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UMyCollectAcceptable), 3638458169U) },
 	};
-	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_MyCollectAcceptable_h_2530642751(TEXT("/Script/NewCppTutorial"),
-		Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_MyCollectAcceptable_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_MyCollectAcceptable_h_Statics::ClassInfo),
+	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_MyCollectAcceptable_h_2530642751(TEXT("/Script/NewCppTutorial"),
+		Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_MyCollectAcceptable_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_MyCollectAcceptable_h_Statics::ClassInfo),
 		nullptr, 0,
 		nullptr, 0);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
