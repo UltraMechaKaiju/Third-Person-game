@@ -11,7 +11,6 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 // Cross Module References
 	ENGINE_API UClass* Z_Construct_UClass_UCharacterMovementComponent();
 	ENGINE_API UClass* Z_Construct_UClass_UCurveFloat_NoRegister();
-	ENGINE_API UClass* Z_Construct_UClass_UStaticMesh_NoRegister();
 	NEWCPPTUTORIAL_API UClass* Z_Construct_UClass_AXpCharacter_NoRegister();
 	NEWCPPTUTORIAL_API UClass* Z_Construct_UClass_UCustomMoveComponent();
 	NEWCPPTUTORIAL_API UClass* Z_Construct_UClass_UCustomMoveComponent_NoRegister();
@@ -450,9 +449,9 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 #endif
 		static const UECodeGen_Private::FObjectPropertyParams NewProp_WallRunGravityScaleCurve;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_ScanMesh_MetaData[];
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_RailGrindPulAwayAngleMax_MetaData[];
 #endif
-		static const UECodeGen_Private::FObjectPropertyParams NewProp_ScanMesh;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_RailGrindPulAwayAngleMax;
 #if WITH_METADATA
 		static const UECodeGen_Private::FMetaDataPairParam NewProp_CustomCharacterOwner_MetaData[];
 #endif
@@ -570,12 +569,12 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 #endif
 	const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve = { "WallRunGravityScaleCurve", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, WallRunGravityScaleCurve), Z_Construct_UClass_UCurveFloat_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve_MetaData) };
 #if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_ScanMesh_MetaData[] = {
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RailGrindPulAwayAngleMax_MetaData[] = {
 		{ "Category", "CustomMoveComponent" },
 		{ "ModuleRelativePath", "CustomMoveComponent.h" },
 	};
 #endif
-	const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_ScanMesh = { "ScanMesh", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, ScanMesh), Z_Construct_UClass_UStaticMesh_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_ScanMesh_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_ScanMesh_MetaData) };
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RailGrindPulAwayAngleMax = { "RailGrindPulAwayAngleMax", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, RailGrindPulAwayAngleMax), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RailGrindPulAwayAngleMax_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RailGrindPulAwayAngleMax_MetaData) };
 #if WITH_METADATA
 	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_CustomCharacterOwner_MetaData[] = {
 		{ "ModuleRelativePath", "CustomMoveComponent.h" },
@@ -601,7 +600,7 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallJumpOffForce,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallAttractionForce,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_ScanMesh,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RailGrindPulAwayAngleMax,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_CustomCharacterOwner,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_skateGravity,
 	};
@@ -638,19 +637,19 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 	}
 	DEFINE_VTABLE_PTR_HELPER_CTOR(UCustomMoveComponent);
 	UCustomMoveComponent::~UCustomMoveComponent() {}
-	struct Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics
+	struct Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics
 	{
 		static const FEnumRegisterCompiledInInfo EnumInfo[];
 		static const FClassRegisterCompiledInInfo ClassInfo[];
 	};
-	const FEnumRegisterCompiledInInfo Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::EnumInfo[] = {
+	const FEnumRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::EnumInfo[] = {
 		{ ECustomMovementMode_StaticEnum, TEXT("ECustomMovementMode"), &Z_Registration_Info_UEnum_ECustomMovementMode, CONSTRUCT_RELOAD_VERSION_INFO(FEnumReloadVersionInfo, 295011779U) },
 	};
-	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo[] = {
-		{ Z_Construct_UClass_UCustomMoveComponent, UCustomMoveComponent::StaticClass, TEXT("UCustomMoveComponent"), &Z_Registration_Info_UClass_UCustomMoveComponent, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UCustomMoveComponent), 1010119427U) },
+	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo[] = {
+		{ Z_Construct_UClass_UCustomMoveComponent, UCustomMoveComponent::StaticClass, TEXT("UCustomMoveComponent"), &Z_Registration_Info_UClass_UCustomMoveComponent, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UCustomMoveComponent), 1918761361U) },
 	};
-	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_948496313(TEXT("/Script/NewCppTutorial"),
-		Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo),
+	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_1056465316(TEXT("/Script/NewCppTutorial"),
+		Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo),
 		nullptr, 0,
-		Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::EnumInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::EnumInfo));
+		Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::EnumInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::EnumInfo));
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

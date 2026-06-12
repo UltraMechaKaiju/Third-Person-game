@@ -79,15 +79,15 @@ void EmptyLinkFunctionForGeneratedCodeWallRunWall() {}
 	}
 	DEFINE_VTABLE_PTR_HELPER_CTOR(AWallRunWall);
 	AWallRunWall::~AWallRunWall() {}
-	struct Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_Public_WallRunWall_h_Statics
+	struct Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_Public_WallRunWall_h_Statics
 	{
 		static const FClassRegisterCompiledInInfo ClassInfo[];
 	};
-	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_Public_WallRunWall_h_Statics::ClassInfo[] = {
+	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_Public_WallRunWall_h_Statics::ClassInfo[] = {
 		{ Z_Construct_UClass_AWallRunWall, AWallRunWall::StaticClass, TEXT("AWallRunWall"), &Z_Registration_Info_UClass_AWallRunWall, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AWallRunWall), 876105626U) },
 	};
-	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_Public_WallRunWall_h_3208984501(TEXT("/Script/NewCppTutorial"),
-		Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_Public_WallRunWall_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_Public_WallRunWall_h_Statics::ClassInfo),
+	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_Public_WallRunWall_h_3208984501(TEXT("/Script/NewCppTutorial"),
+		Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_Public_WallRunWall_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_Public_WallRunWall_h_Statics::ClassInfo),
 		nullptr, 0,
 		nullptr, 0);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
