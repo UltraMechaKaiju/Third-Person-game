@@ -346,15 +346,15 @@ void FOnJumpTriggerSignature_DelegateWrapper(const FMulticastScriptDelegate& OnJ
 	}
 	DEFINE_VTABLE_PTR_HELPER_CTOR(AMyCollectableActor);
 	AMyCollectableActor::~AMyCollectableActor() {}
-	struct Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_MyCollectableActor_h_Statics
+	struct Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_MyCollectableActor_h_Statics
 	{
 		static const FClassRegisterCompiledInInfo ClassInfo[];
 	};
-	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_MyCollectableActor_h_Statics::ClassInfo[] = {
+	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_MyCollectableActor_h_Statics::ClassInfo[] = {
 		{ Z_Construct_UClass_AMyCollectableActor, AMyCollectableActor::StaticClass, TEXT("AMyCollectableActor"), &Z_Registration_Info_UClass_AMyCollectableActor, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AMyCollectableActor), 1251630596U) },
 	};
-	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_MyCollectableActor_h_3078757415(TEXT("/Script/NewCppTutorial"),
-		Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_MyCollectableActor_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_MyCollectableActor_h_Statics::ClassInfo),
+	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_MyCollectableActor_h_3078757415(TEXT("/Script/NewCppTutorial"),
+		Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_MyCollectableActor_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_MyCollectableActor_h_Statics::ClassInfo),
 		nullptr, 0,
 		nullptr, 0);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

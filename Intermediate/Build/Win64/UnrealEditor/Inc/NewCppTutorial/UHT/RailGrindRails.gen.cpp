@@ -11,6 +11,7 @@ void EmptyLinkFunctionForGeneratedCodeRailGrindRails() {}
 // Cross Module References
 	ENGINE_API UClass* Z_Construct_UClass_AActor();
 	ENGINE_API UClass* Z_Construct_UClass_USplineComponent_NoRegister();
+	ENGINE_API UClass* Z_Construct_UClass_USplineMeshComponent_NoRegister();
 	NEWCPPTUTORIAL_API UClass* Z_Construct_UClass_ARailGrindRails();
 	NEWCPPTUTORIAL_API UClass* Z_Construct_UClass_ARailGrindRails_NoRegister();
 	UPackage* Z_Construct_UPackage__Script_NewCppTutorial();
@@ -33,6 +34,11 @@ void EmptyLinkFunctionForGeneratedCodeRailGrindRails() {}
 		static const UECodeGen_Private::FMetaDataPairParam NewProp_GrindRail_MetaData[];
 #endif
 		static const UECodeGen_Private::FObjectPropertyParams NewProp_GrindRail;
+		static const UECodeGen_Private::FObjectPropertyParams NewProp_SplineMeshSegments_Inner;
+#if WITH_METADATA
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_SplineMeshSegments_MetaData[];
+#endif
+		static const UECodeGen_Private::FArrayPropertyParams NewProp_SplineMeshSegments;
 		static const UECodeGen_Private::FPropertyParamsBase* const PropPointers[];
 		static const FCppClassTypeInfoStatic StaticCppClassTypeInfo;
 		static const UECodeGen_Private::FClassParams ClassParams;
@@ -56,8 +62,19 @@ void EmptyLinkFunctionForGeneratedCodeRailGrindRails() {}
 	};
 #endif
 	const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_ARailGrindRails_Statics::NewProp_GrindRail = { "GrindRail", nullptr, (EPropertyFlags)0x001000000008000d, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(ARailGrindRails, GrindRail), Z_Construct_UClass_USplineComponent_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_ARailGrindRails_Statics::NewProp_GrindRail_MetaData), Z_Construct_UClass_ARailGrindRails_Statics::NewProp_GrindRail_MetaData) };
+	const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_ARailGrindRails_Statics::NewProp_SplineMeshSegments_Inner = { "SplineMeshSegments", nullptr, (EPropertyFlags)0x0000000000080008, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, 0, Z_Construct_UClass_USplineMeshComponent_NoRegister, METADATA_PARAMS(0, nullptr) };
+#if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_ARailGrindRails_Statics::NewProp_SplineMeshSegments_MetaData[] = {
+		{ "Category", "Custom" },
+		{ "EditInline", "true" },
+		{ "ModuleRelativePath", "Public/RailGrindRails.h" },
+	};
+#endif
+	const UECodeGen_Private::FArrayPropertyParams Z_Construct_UClass_ARailGrindRails_Statics::NewProp_SplineMeshSegments = { "SplineMeshSegments", nullptr, (EPropertyFlags)0x001000800000000d, UECodeGen_Private::EPropertyGenFlags::Array, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(ARailGrindRails, SplineMeshSegments), EArrayPropertyFlags::None, METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_ARailGrindRails_Statics::NewProp_SplineMeshSegments_MetaData), Z_Construct_UClass_ARailGrindRails_Statics::NewProp_SplineMeshSegments_MetaData) };
 	const UECodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_ARailGrindRails_Statics::PropPointers[] = {
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ARailGrindRails_Statics::NewProp_GrindRail,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ARailGrindRails_Statics::NewProp_SplineMeshSegments_Inner,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ARailGrindRails_Statics::NewProp_SplineMeshSegments,
 	};
 	const FCppClassTypeInfoStatic Z_Construct_UClass_ARailGrindRails_Statics::StaticCppClassTypeInfo = {
 		TCppClassTypeTraits<ARailGrindRails>::IsAbstract,
@@ -92,15 +109,15 @@ void EmptyLinkFunctionForGeneratedCodeRailGrindRails() {}
 	}
 	DEFINE_VTABLE_PTR_HELPER_CTOR(ARailGrindRails);
 	ARailGrindRails::~ARailGrindRails() {}
-	struct Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_Public_RailGrindRails_h_Statics
+	struct Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_Public_RailGrindRails_h_Statics
 	{
 		static const FClassRegisterCompiledInInfo ClassInfo[];
 	};
-	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_Public_RailGrindRails_h_Statics::ClassInfo[] = {
-		{ Z_Construct_UClass_ARailGrindRails, ARailGrindRails::StaticClass, TEXT("ARailGrindRails"), &Z_Registration_Info_UClass_ARailGrindRails, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(ARailGrindRails), 3682567328U) },
+	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_Public_RailGrindRails_h_Statics::ClassInfo[] = {
+		{ Z_Construct_UClass_ARailGrindRails, ARailGrindRails::StaticClass, TEXT("ARailGrindRails"), &Z_Registration_Info_UClass_ARailGrindRails, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(ARailGrindRails), 2800888550U) },
 	};
-	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_Public_RailGrindRails_h_4137375857(TEXT("/Script/NewCppTutorial"),
-		Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_Public_RailGrindRails_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_Public_RailGrindRails_h_Statics::ClassInfo),
+	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_Public_RailGrindRails_h_4238432531(TEXT("/Script/NewCppTutorial"),
+		Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_Public_RailGrindRails_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_Public_RailGrindRails_h_Statics::ClassInfo),
 		nullptr, 0,
 		nullptr, 0);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

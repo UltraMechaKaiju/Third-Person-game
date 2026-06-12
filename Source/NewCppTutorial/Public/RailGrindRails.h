@@ -18,6 +18,8 @@ public:
 	ARailGrindRails();
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Custom")
 	USplineComponent* GrindRail;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Custom")
+	TArray <USplineMeshComponent*> SplineMeshSegments;
 	FVector GetGrindSplineClosestLocation(FVector FootLocation);
 	//UPROPERTY(VisibleAnywhere, Category = "Custom")
 	//USplineMeshComponent* SimpleMesh;

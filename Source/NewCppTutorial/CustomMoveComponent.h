@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "RailGrindRails.h"
 
 #include "CustomMoveComponent.generated.h"
 
@@ -31,7 +32,7 @@ class NEWCPPTUTORIAL_API UCustomMoveComponent : public UCharacterMovementCompone
 		typedef FSavedMove_Character Super;
 
 		//custom variables
-		//uint32 Saved_GrindRailUId;
+		ARailGrindRails* Saved_GrindRail;
 		
 
 		//custom flags
@@ -70,7 +71,7 @@ class NEWCPPTUTORIAL_API UCustomMoveComponent : public UCharacterMovementCompone
 	UPROPERTY(EditDefaultsOnly) float WallJumpOffForce = 200.f;
 	UPROPERTY(EditDefaultsOnly) float WallAttractionForce = 1000.f;
 	UPROPERTY(EditDefaultsOnly) UCurveFloat* WallRunGravityScaleCurve;
-	UPROPERTY(EditDefaultsOnly) UStaticMesh* ScanMesh;
+	UPROPERTY(EditDefaultsOnly) float RailGrindPulAwayAngleMax = 90;
 
 	//client side Flags
 
@@ -78,7 +79,7 @@ class NEWCPPTUTORIAL_API UCustomMoveComponent : public UCharacterMovementCompone
 	bool safe_bWallRunRight;
 
 	//client suide variables
-	//uint32 Safe_GrindRailUId;
+	ARailGrindRails* Safe_GrindRail;
 
 	UStaticMeshComponent* RailGrindStaticMesh;
 	
@@ -101,7 +102,6 @@ public:
 	virtual bool DoJump(bool bReplayingMoves) override;
 	virtual float GetMaxSpeed() const override;
 	virtual float GetMaxBrakingDeceleration() const override;
-
 	UFUNCTION(BlueprintPure) bool IsWallRunning() const { return IsCustomMovementMode(CMOVE_WallRun); }
 	UFUNCTION(BlueprintPure) bool WallRunningIsRight() const { return safe_bWallRunRight; }
 	UFUNCTION(BlueprintCallable) bool SpeedCheck();

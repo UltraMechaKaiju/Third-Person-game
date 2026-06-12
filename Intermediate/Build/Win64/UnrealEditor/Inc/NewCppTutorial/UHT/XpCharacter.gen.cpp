@@ -116,10 +116,6 @@ void EmptyLinkFunctionForGeneratedCodeXpCharacter() {}
 #endif
 		static const UECodeGen_Private::FObjectPropertyParams NewProp_PlayerCamera;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_GrindRailHitBoxContainer_MetaData[];
-#endif
-		static const UECodeGen_Private::FObjectPropertyParams NewProp_GrindRailHitBoxContainer;
-#if WITH_METADATA
 		static const UECodeGen_Private::FMetaDataPairParam NewProp_PlayerMesh_MetaData[];
 #endif
 		static const UECodeGen_Private::FObjectPropertyParams NewProp_PlayerMesh;
@@ -203,14 +199,6 @@ void EmptyLinkFunctionForGeneratedCodeXpCharacter() {}
 #endif
 	const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AXpCharacter_Statics::NewProp_PlayerCamera = { "PlayerCamera", nullptr, (EPropertyFlags)0x001000000008000c, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AXpCharacter, PlayerCamera), Z_Construct_UClass_UCameraComponent_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_AXpCharacter_Statics::NewProp_PlayerCamera_MetaData), Z_Construct_UClass_AXpCharacter_Statics::NewProp_PlayerCamera_MetaData) };
 #if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AXpCharacter_Statics::NewProp_GrindRailHitBoxContainer_MetaData[] = {
-		{ "Category", "XpCharacter" },
-		{ "EditInline", "true" },
-		{ "ModuleRelativePath", "XpCharacter.h" },
-	};
-#endif
-	const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AXpCharacter_Statics::NewProp_GrindRailHitBoxContainer = { "GrindRailHitBoxContainer", nullptr, (EPropertyFlags)0x001000000008000c, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AXpCharacter, GrindRailHitBoxContainer), Z_Construct_UClass_UStaticMeshComponent_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_AXpCharacter_Statics::NewProp_GrindRailHitBoxContainer_MetaData), Z_Construct_UClass_AXpCharacter_Statics::NewProp_GrindRailHitBoxContainer_MetaData) };
-#if WITH_METADATA
 	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AXpCharacter_Statics::NewProp_PlayerMesh_MetaData[] = {
 		{ "Category", "XpCharacter" },
 		{ "EditInline", "true" },
@@ -265,7 +253,6 @@ void EmptyLinkFunctionForGeneratedCodeXpCharacter() {}
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AXpCharacter_Statics::NewProp_ScanTriangle1,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AXpCharacter_Statics::NewProp_Springarm,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AXpCharacter_Statics::NewProp_PlayerCamera,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AXpCharacter_Statics::NewProp_GrindRailHitBoxContainer,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AXpCharacter_Statics::NewProp_PlayerMesh,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AXpCharacter_Statics::NewProp_TestHitBox,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AXpCharacter_Statics::NewProp_InputMapping,
@@ -306,15 +293,15 @@ void EmptyLinkFunctionForGeneratedCodeXpCharacter() {}
 	}
 	DEFINE_VTABLE_PTR_HELPER_CTOR(AXpCharacter);
 	AXpCharacter::~AXpCharacter() {}
-	struct Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_XpCharacter_h_Statics
+	struct Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_XpCharacter_h_Statics
 	{
 		static const FClassRegisterCompiledInInfo ClassInfo[];
 	};
-	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_XpCharacter_h_Statics::ClassInfo[] = {
-		{ Z_Construct_UClass_AXpCharacter, AXpCharacter::StaticClass, TEXT("AXpCharacter"), &Z_Registration_Info_UClass_AXpCharacter, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AXpCharacter), 3614563130U) },
+	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_XpCharacter_h_Statics::ClassInfo[] = {
+		{ Z_Construct_UClass_AXpCharacter, AXpCharacter::StaticClass, TEXT("AXpCharacter"), &Z_Registration_Info_UClass_AXpCharacter, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AXpCharacter), 4185813915U) },
 	};
-	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_XpCharacter_h_4007159550(TEXT("/Script/NewCppTutorial"),
-		Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_XpCharacter_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_NewCppTutorial_Source_NewCppTutorial_XpCharacter_h_Statics::ClassInfo),
+	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_XpCharacter_h_1948379775(TEXT("/Script/NewCppTutorial"),
+		Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_XpCharacter_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_XpCharacter_h_Statics::ClassInfo),
 		nullptr, 0,
 		nullptr, 0);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

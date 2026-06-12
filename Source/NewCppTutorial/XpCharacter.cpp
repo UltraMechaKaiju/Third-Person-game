@@ -21,8 +21,6 @@ AXpCharacter::AXpCharacter(const FObjectInitializer& ObjectInitializer)
 	PlayerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
 	PlayerMesh->SetupAttachment(GetCapsuleComponent());
 
-	GrindRailHitBoxContainer = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GRHBC"));
-	GrindRailHitBoxContainer->SetupAttachment(GetCapsuleComponent());
 
 	Springarm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	Springarm->SetupAttachment(GetCapsuleComponent());
@@ -35,13 +33,6 @@ AXpCharacter::AXpCharacter(const FObjectInitializer& ObjectInitializer)
 
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 	PlayerCamera->SetupAttachment(Springarm,USpringArmComponent::SocketName);
-}
-
-TArray<AActor*> AXpCharacter::GetRailGrindHitBoxOverlapped(){
-	TArray<AActor*> Overlapped;
-	Overlapped.Empty();
-	GrindRailHitBoxContainer->GetOverlappingActors(Overlapped,ARailGrindRails::StaticClass());
-	return Overlapped;
 }
 
 // Called when the game starts or when spawned

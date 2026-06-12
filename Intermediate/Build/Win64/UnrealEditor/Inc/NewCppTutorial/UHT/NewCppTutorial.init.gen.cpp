@@ -23,13 +23,13 @@ void EmptyLinkFunctionForGeneratedCodeNewCppTutorial_init() {}
 				SingletonFuncArray,
 				UE_ARRAY_COUNT(SingletonFuncArray),
 				PKG_CompiledIn | 0x00000000,
-				0x701DABEA,
-				0x2DCB0BD3,
+				0x75AF9253,
+				0xDC9EA03E,
 				METADATA_PARAMS(0, nullptr)
 			};
 			UECodeGen_Private::ConstructUPackage(Z_Registration_Info_UPackage__Script_NewCppTutorial.OuterSingleton, PackageParams);
 		}
 		return Z_Registration_Info_UPackage__Script_NewCppTutorial.OuterSingleton;
 	}
-	static FRegisterCompiledInInfo Z_CompiledInDeferPackage_UPackage__Script_NewCppTutorial(Z_Construct_UPackage__Script_NewCppTutorial, TEXT("/Script/NewCppTutorial"), Z_Registration_Info_UPackage__Script_NewCppTutorial, CONSTRUCT_RELOAD_VERSION_INFO(FPackageReloadVersionInfo, 0x701DABEA, 0x2DCB0BD3));
+	static FRegisterCompiledInInfo Z_CompiledInDeferPackage_UPackage__Script_NewCppTutorial(Z_Construct_UPackage__Script_NewCppTutorial, TEXT("/Script/NewCppTutorial"), Z_Registration_Info_UPackage__Script_NewCppTutorial, CONSTRUCT_RELOAD_VERSION_INFO(FPackageReloadVersionInfo, 0x75AF9253, 0xDC9EA03E));
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

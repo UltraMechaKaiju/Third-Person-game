@@ -13,6 +13,8 @@
 #include "XpCharacter.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #pragma region constants
 namespace CharacterMovementConstants {
@@ -21,7 +23,7 @@ namespace CharacterMovementConstants {
 
 namespace CharacterMovementCVars {
 	int32 ForceJumpPeakSubstep = 1;
-	int32 UseTargetVelocityOnImpact = 1;
+	int32 UseTargetVelocityOnImpact = 0;
 }
 #pragma endregion
 
@@ -165,37 +167,102 @@ float UCustomMoveComponent::GetMaxBrakingDeceleration() const {
 //Jumping
 bool UCustomMoveComponent::CanAttemptJump() const
 {
-	return Super::CanAttemptJump() || IsWallRunning();
+	return Super::CanAttemptJump() || IsWallRunning() || IsRailGrinding();
 }
 
 bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 {
 	bool bWasWallRunning = IsWallRunning();
 	bool bWasRailGrinding = IsRailGrinding();
-	if (Super::DoJump(bReplayingMoves)) {
-		if (bWasWallRunning) {
-			FVector Start = UpdatedComponent->GetComponentLocation();
-			FVector CastDelta = Velocity.RotateAngleAxis(90, FVector::UpVector) * CapR() * 2;
-			FVector End = safe_bWallRunRight ? Start + CastDelta : Start - CastDelta;
-			auto Params = CustomCharacterOwner->GetIgnoreCharacterParams();
-			FHitResult WallHit;
-			GetWorld()->LineTraceSingleByProfile(WallHit, Start, End, "BlockAll", Params);
+	UE_LOG(LogTemp, Warning, TEXT("Jump"))
 
-			FVector JumpDir = safe_bWallRunRight ? Velocity.GetSafeNormal().RotateAngleAxis(270, FVector::UpVector) : Velocity.GetSafeNormal().RotateAngleAxis(90, FVector::UpVector);
-
-			WallJumpOffForce = Velocity.Size();
-
-			Velocity += JumpDir * WallJumpOffForce;
-
-			Velocity *= WallJumpOffForce / Velocity.Size();
-		}
-		if (bWasRailGrinding) {
-			safe_bCanRailGrind = false;
-		}
-
+	if (bWasWallRunning) {
+		Super::DoJump(bReplayingMoves);
+		safe_bWallRunRight ? Velocity = Velocity.RotateAngleAxis(360-45, FVector::UpVector) : Velocity = Velocity.RotateAngleAxis(45, FVector::UpVector);
 		return true;
 	}
+	if (bWasRailGrinding) {
+		UE_LOG(LogTemp, Warning, TEXT("RailGrindJump"));
 
+		FVector RailJumpDir = UpdatedComponent->GetUpVector();
+
+		float JumpVelZMax = JumpZVelocity * 1.5;
+		float JumpVelZMin = JumpZVelocity * .5;
+		float DesiredJumpZVel = Velocity.Z + JumpZVelocity;
+
+		FVector TotalJump = RailJumpDir * DesiredJumpZVel;
+
+		FVector PreJumpVelocity = Velocity;
+		float PreJumpSpeed = FVector(Velocity.X,Velocity.Y,0).Size();
+		FVector PreJumpForwardVector = FVector(Velocity.X, Velocity.Y, 0).GetSafeNormal();
+		if (PreJumpForwardVector.Size() == 0) { PreJumpForwardVector = UpdatedComponent->GetUpVector(); }
+
+		FVector RawPostJump = Velocity + TotalJump;
+		float FinalZVal = FMath::Clamp(RawPostJump.Z, JumpVelZMin, JumpVelZMax);
+		FVector FinalDir;
+
+		FVector RightCompare = PreJumpForwardVector.RotateAngleAxis(90, FVector::UpVector); /*Right Or Left?*/
+		
+		//Are we on a vertical rail?
+		float DotProductV = FVector::DotProduct(Velocity.GetSafeNormal(), FVector::UpVector);
+		float RadianDeltaV = FMath::Acos(DotProductV);
+		float DegreeDeltaV = FMath::RadiansToDegrees(RadianDeltaV);
+
+		if (DegreeDeltaV < 10 || DegreeDeltaV > 170) {
+			UE_LOG(LogTemp, Warning, TEXT("Back/FrontFlip"))
+			Velocity = (RailJumpDir.GetSafeNormal2D() * PreJumpSpeed);
+			Velocity.Z = JumpZVelocity;
+			UpdatedComponent->SetWorldRotation(Velocity.GetSafeNormal2D().Rotation().Quaternion());
+			SetMovementMode(MOVE_Falling);
+			safe_bCanRailGrind = false;
+			return true;
+		}
+
+
+		float DotProduct = FVector::DotProduct(PreJumpForwardVector, RawPostJump.GetSafeNormal2D());
+		float RadianDelta = FMath::Acos(DotProduct);
+		float DegreeDelta = FMath::RadiansToDegrees(RadianDelta);
+
+		//Normal Jump off cases
+		if (DegreeDelta > 170) {
+			//The Jump force has turned the character around, so they are facing the wrong direction
+			UE_LOG(LogTemp, Warning, TEXT("Case0"))
+			FinalDir = PreJumpVelocity.GetSafeNormal2D() * PreJumpSpeed;
+			FinalDir.Z = FinalZVal;
+		}
+		//elif The jump force has pointed the character to far to the left or right
+		else if (FMath::Abs(DegreeDelta) > RailGrindPulAwayAngleMax) {
+			float DotProductR = FVector::DotProduct(RightCompare, RawPostJump.GetSafeNormal2D());
+			float RadianDeltaR = FMath::Acos(DotProductR);
+			float DegreeDeltaR = FMath::RadiansToDegrees(RadianDeltaR);
+			if (FMath::Abs(DegreeDeltaR) > 90) {
+				UE_LOG(LogTemp, Warning, TEXT("Case1"))
+				FinalDir = PreJumpForwardVector.RotateAngleAxis(90, FVector::UpVector).GetSafeNormal2D() * PreJumpSpeed;
+				FinalDir.Z = FinalZVal;
+			}
+			else{
+				UE_LOG(LogTemp, Warning, TEXT("Case2"))
+				FinalDir = PreJumpForwardVector.RotateAngleAxis(270, FVector::UpVector).GetSafeNormal2D() * PreJumpSpeed;
+				FinalDir.Z = FinalZVal;
+			}
+		}
+		//JumpForce didn't create any issues
+		else {
+			FinalDir = RawPostJump.GetSafeNormal2D() * PreJumpSpeed;
+			FinalDir.Z = FinalZVal;
+		}
+		Velocity = FinalDir;
+
+		UpdatedComponent->SetWorldRotation(Velocity.GetSafeNormal2D().Rotation().Quaternion());
+		SetMovementMode(MOVE_Falling);
+		safe_bCanRailGrind = false;
+		return true;
+	}
+	else {
+		Super::DoJump(bReplayingMoves);
+		return true;
+	}
+	
 	return false;
 }
 
@@ -206,9 +273,7 @@ void UCustomMoveComponent::UpdateCharacterStateBeforeMovement(float DeltaSeconds
 		safe_bCanRailGrind = true;
 	}
 	if (IsFalling()) {
-		if (!TryWallRun()) {
-			//TryRailGrind();
-		}
+		TryWallRun();
 	}
 
 	Super::UpdateCharacterStateBeforeMovement(DeltaSeconds);
@@ -285,9 +350,8 @@ bool UCustomMoveComponent::TryWallRun()
 {
 	//initial Checks
 	if (!IsFalling()) return false;
-	if (Velocity.SizeSquared2D() < pow(MinWallRunSpeed, 2))return false;
+	//if (Velocity.GetSafeNormal2D().Length() < MinWallRunSpeed) {return false;}
 	//if (Velocity.Z < -MaxVerticalRunSpeed) return false;
-
 	FHitResult WallRunWall;
 
 #pragma region LineTraceimplementation
@@ -521,15 +585,15 @@ bool UCustomMoveComponent::TryWallRun()
 	//Velocity.Z = FMath::Clamp(Velocity.Z, 0.f, MaxVerticalRunSpeed);
 
 	//if (WallRunWall.Normal == FVector(0, 0, 0)) { UE_LOG(LogTemp, Warning, TEXT(" No Wall Passes")); return false; }
-
+#pragma endregion
 
 	if (safe_bWallRunRight) {
-		Velocity = WallRunWall.Normal.RotateAngleAxis(90, FVector::UpVector);
+		Velocity = WallRunWall.Normal.RotateAngleAxis(90, FVector::UpVector) * FVector(Velocity.X, Velocity.Y, 0).Length();
 		DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + WallRunWall.Normal * 500, FColor::Yellow, true, 1, 12);
 		if (Velocity == FVector(0, 0, 0)) { UE_LOG(LogTemp, Warning, TEXT(" Try Bug")) }
 	}
 	else {
-		Velocity = WallRunWall.Normal.RotateAngleAxis(270, FVector::UpVector);
+		Velocity = WallRunWall.Normal.RotateAngleAxis(270, FVector::UpVector) * FVector(Velocity.X, Velocity.Y, 0).Length();
 		DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + WallRunWall.Normal * 500, FColor::Yellow, true, 1, 12);
 		if (Velocity == FVector(0, 0, 0)) { UE_LOG(LogTemp, Warning, TEXT("Try Bug")) }
 	}
@@ -540,22 +604,10 @@ bool UCustomMoveComponent::TryWallRun()
 	return true;
 }
 
-#pragma endregion
+
 
 bool UCustomMoveComponent::TryRailGrind(){
-	if ((CustomCharacterOwner->GetRailGrindHitBoxOverlapped()).Num() >= 1.f) {
-		UE_LOG(LogTemp, Warning, TEXT("Hit"));
-		if (safe_bCanRailGrind) {
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	UE_LOG(LogTemp, Warning, TEXT("NoHit"));
-	safe_bCanRailGrind = true;
-	return false;
+	return true;
 }
 
 
@@ -769,14 +821,13 @@ void UCustomMoveComponent::PhysWallRun(float deltaTime, int32 Iterations)
 		DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + MoveDirection * 50, FColor::Blue, true);
 
 		if (safe_bWallRunRight) {
-			Velocity = MoveDirection.RotateAngleAxis(90, FVector::UpVector) * 500;
+			Velocity = MoveDirection.RotateAngleAxis(90, FVector::UpVector) * FVector(Velocity.X,Velocity.Y,0).Length();
 			//UE_LOG(LogTemp, Warning, TEXT("Right"))
 		}
 		else {
-			Velocity = MoveDirection.RotateAngleAxis(270, FVector::UpVector) * 500;
+			Velocity = MoveDirection.RotateAngleAxis(270, FVector::UpVector) * FVector(Velocity.X, Velocity.Y, 0).Length();
 			//UE_LOG(LogTemp, Warning, TEXT("Left"))
 		}
-		
 		
 
 		//For WallRuns That Can Change Z Height
@@ -806,7 +857,7 @@ void UCustomMoveComponent::PhysWallRun(float deltaTime, int32 Iterations)
 			SafeMoveUpdatedComponent(Delta, UpdatedComponent->GetComponentQuat(), true, WallRunHit);
 			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + Delta * 50, FColor::Blue, false, 1 / 60, 10, 1.25);
 			FVector WallAttractionDelta = -WallHit.Normal * WallAttractionForce * timeTick;
-			SafeMoveUpdatedComponent(WallAttractionDelta, UpdatedComponent->GetComponentQuat(), true, WallAttractionHit);
+			SafeMoveUpdatedComponent(WallAttractionDelta, Velocity.GetSafeNormal2D().Rotation().Quaternion(), true, WallAttractionHit);
 
 			if (WallRunHit.IsValidBlockingHit()) {
 				HandleImpact(WallRunHit, timeTick, Delta);
@@ -825,7 +876,7 @@ void UCustomMoveComponent::PhysWallRun(float deltaTime, int32 Iterations)
 		}
 
 		//make velocity match the actual movement that is created by using velocity and adding wall attraction force
-		Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / timeTick;
+		//Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / timeTick;
 
 		//DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + Velocity * 100, FColor::Green, false, 1 / 60, 10, 1.25);
 		if (Velocity.Size() == 0)UE_LOG(LogTemp, Warning, TEXT("Zero velocity"));
@@ -909,35 +960,19 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 		FVector SelectedRailClosestLocation;
 		FVector CapsuleSplineDelta;
 		float SplineEndDistance;
-		FVector CapsuleBottomExt = UpdatedComponent->GetComponentLocation() - FVector(0, 0, CapHH());
+		FVector CapsuleBottomExt = UpdatedComponent->GetComponentLocation() - (UpdatedComponent->GetUpVector() * CapHH());
+
 		FHitResult RailGrindHit;
-		TArray<AActor*> DetectedGrindRails = CustomCharacterOwner->GetRailGrindHitBoxOverlapped();
 
-		if (DetectedGrindRails.Num() == 0) {
-			SetMovementMode(MOVE_Falling);
-			StartNewPhysics(RemainingTime + timeTick, Iterations);
-			UE_LOG(LogTemp, Warning, TEXT("Rail Grinding was initiated, but no rails were detected"))
-				return;
-		}
-		
-		SelectedRail = Cast<ARailGrindRails>(DetectedGrindRails[0]);
-		//look at all the rails and pick the closest one, starting from the second rail, as the first rail is chosen as the one to be compared against
-		for (int i = 1; i < DetectedGrindRails.Num(); i++) {
-			ARailGrindRails* CompareRail = Cast<ARailGrindRails>(DetectedGrindRails[i]);
-			int CompareRailDist = (CapsuleBottomExt - CompareRail->GetGrindSplineClosestLocation(CapsuleBottomExt)).Length();
-			int SelectedRailDist = (CapsuleBottomExt - SelectedRail->GetGrindSplineClosestLocation(CapsuleBottomExt)).Length();
-			if (SelectedRailDist > CompareRailDist) {
-				SelectedRail = Cast<ARailGrindRails>(CompareRail);
 
-				//Define Variables
-				SelectedRailDistFrom = (CapsuleBottomExt - SelectedRail->GetGrindSplineClosestLocation(CapsuleBottomExt)).Length();
-				SelectedRailClosestLocation = SelectedRail->GetGrindSplineClosestLocation(CapsuleBottomExt);
-				CapsuleSplineDelta = (SelectedRail->GetGrindSplineClosestLocation(CapsuleBottomExt) - CapsuleBottomExt);
-				SelectedSpline = SelectedRail->GrindRail;
-				SelectedRailDistAlongStart = SelectedSpline->GetDistanceAlongSplineAtLocation(SelectedRailClosestLocation, ESplineCoordinateSpace::World);
-				SplineEndDistance = SelectedSpline->GetSplineLength();
-			}
-		}
+		SelectedRail = Safe_GrindRail;
+		//Define Variables
+		SelectedRailDistFrom = (CapsuleBottomExt - SelectedRail->GetGrindSplineClosestLocation(CapsuleBottomExt)).Length();
+		SelectedRailClosestLocation = SelectedRail->GetGrindSplineClosestLocation(CapsuleBottomExt);
+		CapsuleSplineDelta = (SelectedRail->GetGrindSplineClosestLocation(CapsuleBottomExt) - CapsuleBottomExt);
+		SelectedSpline = SelectedRail->GrindRail;
+		SelectedRailDistAlongStart = SelectedSpline->GetDistanceAlongSplineAtLocation(SelectedRailClosestLocation, ESplineCoordinateSpace::World);
+		SplineEndDistance = SelectedSpline->GetSplineLength();
 		//RailHasBeen Selected
 		//If the player is far from the rail, Take into account the distance from the rail 
 		/*if (SelectedRailDistFrom >= UE_KINDA_SMALL_NUMBER) {
@@ -960,41 +995,97 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 
 		if ((FMath::Acos(FVector::DotProduct(ForwardToBeUsed, SplineForward))) > (PI / 2)) {
 			DirectionModifier = -1;
+			//UE_LOG(LogTemp, Warning, TEXT("-1"))
 		}
 		else {
 			DirectionModifier = 1;
+			//UE_LOG(LogTemp, Warning, TEXT("1"))
 		}
 
 		//Calculate the final distance along the rail after movement
-		SelectedRailDistAlongFinal = ((SelectedSpline->GetDistanceAlongSplineAtLocation(SelectedRailClosestLocation, ESplineCoordinateSpace::World)) + Velocity.Length()) * DirectionModifier;
-		SelectedRailDistAlongFinalClamped = FMath::Clamp(((SelectedSpline->GetDistanceAlongSplineAtLocation(SelectedRailClosestLocation, ESplineCoordinateSpace::World)) + Velocity.Length()) * DirectionModifier,0,SplineEndDistance);
-		FVector SelectedRailDistAlongFinalClampedLoction = SelectedSpline->GetLocationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
-		FVector MoveDelta = SelectedRailDistAlongFinalClampedLoction - CapsuleBottomExt;
+
+		SelectedRailDistAlongFinal = (SelectedRailDistAlongStart)+((FVector(Velocity.X, Velocity.Y, 0).Length() * timeTick) * DirectionModifier);
+
+		SelectedRailDistAlongFinalClamped = FMath::Clamp(SelectedRailDistAlongFinal,0,SplineEndDistance);
+		FVector SelectedRailLocationFinalClamped = SelectedSpline->GetLocationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
 		float SelectedRailDistAlongFinalDelta = SelectedRailDistAlongFinal - SelectedRailDistAlongFinalClamped;
 		float PercentOfTimeUsed = SelectedRailDistAlongFinalClamped / SelectedRailDistAlongFinal;
 
-		//Check if closest point is the end of the rail i.e you will immediately fall off and if so abort
-		if (DirectionModifier == 1 && (SelectedRailDistAlongStart == SplineEndDistance) || DirectionModifier == -1 && (SelectedRailDistAlongStart == 0.f)) {
-			SetMovementMode(MOVE_Falling);
-			StartNewPhysics(RemainingTime+timeTick, Iterations);
-			return;
+		if (SelectedSpline->IsClosedLoop() && SelectedRailDistAlongFinalDelta != 0) {
+			if (SelectedSpline->GetSplineLength() > FMath::Abs(SelectedRailDistAlongFinalDelta)) {
+				if (DirectionModifier == -1) {
+					SelectedRailDistAlongFinalClamped = (SelectedSpline->GetSplineLength() + SelectedRailDistAlongFinalDelta);
+				}
+				else {
+					SelectedRailDistAlongFinalClamped = SelectedRailDistAlongFinalDelta;
+				}
+				SelectedRailLocationFinalClamped = SelectedSpline->GetLocationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
+			}
+			else {
+				float SelectedRailModulo = FMath::Fmod(FMath::Abs(SelectedRailDistAlongFinalDelta), SelectedSpline->GetSplineLength()) * DirectionModifier;
+				if (DirectionModifier == -1) {
+					SelectedRailDistAlongFinalClamped = (SelectedSpline->GetSplineLength() + SelectedRailModulo);
+				}
+				else {
+					SelectedRailDistAlongFinalClamped = SelectedRailModulo;
+				}
+
+				SelectedRailDistAlongFinalClamped = FMath::Fmod(FMath::Abs(SelectedRailDistAlongFinalDelta), SelectedSpline->GetSplineLength());
+				SelectedRailLocationFinalClamped = SelectedSpline->GetLocationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
+			}
 		}
 
-		//We have everything we need to move, so do the move
-		SafeMoveUpdatedComponent(MoveDelta, UpdatedComponent->GetComponentQuat(), true, RailGrindHit);
+		//new
+		//FVector Rotater = ((SelectedSpline->GetTangentAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World)).GetSafeNormal2D()).RotateAngleAxis(90,FVector::UpVector);
+		//FVector RailRelativeUp = SelectedSpline->GetTangentAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World).RotateAngleAxis(-90, Rotater);
+		FVector RailRelativeUp = SelectedSpline->GetTransformAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World).GetUnitAxis(EAxis::Z);
 
-		//Update Variables
-		Velocity = (SelectedSpline->GetDirectionAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World)) * Velocity.Length();
+		FVector SelectedCharacterLocationFinal = SelectedRailLocationFinalClamped + RailRelativeUp.GetSafeNormal() * CapHH();
+		FVector NewMoveDelta = SelectedCharacterLocationFinal - UpdatedComponent->GetComponentLocation();
 
+		//Check if closest point is the end of the rail i.e you will immediately fall off and if so abort
+		if (DirectionModifier == 1 && (SelectedRailDistAlongStart == SplineEndDistance)  && !SelectedSpline->IsClosedLoop()|| DirectionModifier == -1 && (SelectedRailDistAlongStart == 0.f) && !SelectedSpline->IsClosedLoop()) {
+			SetMovementMode(MOVE_Falling);
+			UE_LOG(LogTemp, Warning, TEXT("Falloff"))
+			safe_bCanRailGrind = false;
+			Safe_GrindRail = nullptr;
+			UpdatedComponent->SetWorldRotation(Velocity.GetSafeNormal2D().Rotation().Quaternion());
+			StartNewPhysics(RemainingTime+timeTick, Iterations);
+			return;
+		} 
+
+		//delete?
+		SelectedRailClosestLocation;
+		FVector SelectedRailClosestLocationTangent = (SelectedSpline->GetTangentAtDistanceAlongSpline(SelectedRailDistAlongStart, ESplineCoordinateSpace::World)).RotateAngleAxis(90,UpdatedComponent->GetUpVector());
+		//
+
+		
+		FQuat NewRotation = SelectedSpline->GetTangentAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World).Rotation().Quaternion();
+
+		NewRotation = SelectedSpline->GetRotationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World).Quaternion();
+
+		SafeMoveUpdatedComponent(NewMoveDelta, NewRotation, false, RailGrindHit, ETeleportType::TeleportPhysics);
 
 		//Do we have to fall off??
 
-		if (DirectionModifier == 1 && (SelectedRailDistAlongFinal > SplineEndDistance) || DirectionModifier == -1 && (SelectedRailDistAlongFinal < 0.f)) {
+		if (DirectionModifier == 1 && (SelectedRailDistAlongFinal > SplineEndDistance) && !SelectedSpline->IsClosedLoop() || DirectionModifier == -1 && (SelectedRailDistAlongFinal < 0.f) && !SelectedSpline->IsClosedLoop()) {
+			//Loop to the start of the rail
+			
+			//jump off rail
+			Velocity = (SelectedSpline->GetDirectionAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World)) * (FVector(Velocity.X, Velocity.Y, 0).Length()) * DirectionModifier;
+			UpdatedComponent->SetWorldRotation(Velocity.GetSafeNormal2D().Rotation().Quaternion());
 			SetMovementMode(MOVE_Falling);
 			safe_bCanRailGrind = false;
+			Safe_GrindRail = nullptr;
 			StartNewPhysics(RemainingTime + timeTick - (timeTick * PercentOfTimeUsed), Iterations);
 			return;
 		}
+
+		//The purpose of this part is to ensure the velocity Vector in the XY plane is always the same, while also making sure that adding in the z direction results in the correct direction along the spline 
+		FVector SplineFinalLocDirection = SelectedSpline->GetDirectionAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
+		float VelocityDirectionNormlaizer = FVector(Velocity.X, Velocity.Y, 0).Length() / FVector(SplineFinalLocDirection.X, SplineFinalLocDirection.Y, 0).Length();
+		Velocity = VelocityDirectionNormlaizer * SplineFinalLocDirection * DirectionModifier;
+		DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + Velocity, FColor::Blue, false);
 	}
 }
 
@@ -1480,6 +1571,10 @@ void UCustomMoveComponent::PhysFalling(float deltaTime, int32 Iterations)
 		// Move
 		FHitResult Hit(1.f);
 		SafeMoveUpdatedComponent(Adjusted, PawnRotation, true, Hit);
+		//Custom Start
+		FVector PostMoveVelocity = Velocity;
+		//Custom End
+		
 
 		if (!HasValidData())
 		{
@@ -1495,21 +1590,22 @@ void UCustomMoveComponent::PhysFalling(float deltaTime, int32 Iterations)
 			StartSwimming(OldLocation, OldVelocity, timeTick, remainingTime, Iterations);
 			return;
 		}
+		//custom Start
+		if (!Hit.bBlockingHit) {
+			safe_bCanRailGrind = true;
+		}
 		else if (Hit.bBlockingHit)
 		{
-			//custom
-			if (Cast<ARailGrindRails>(Hit.GetActor())) {
-				FHitResult CustomHit;
-				FVector startLoc = UpdatedComponent->GetComponentLocation()+(FVector(0,0,-CapHH()));
-				FVector EndLoc = startLoc + FVector(0,0,-MAX_FLOOR_DIST);
-				FCollisionShape CollisionShape;
-				CollisionShape.MakeSphere(CapR());
-				GetWorld()->SweepSingleByProfile(CustomHit, startLoc, EndLoc, UpdatedComponent->GetComponentQuat(), "BlockAll", CollisionShape);
+			if (Cast<ARailGrindRails>(Hit.GetActor()) && safe_bCanRailGrind) {
+				Safe_GrindRail = Cast<ARailGrindRails>(Hit.GetActor());
 				SetMovementMode(MOVE_Custom, CMOVE_RailGrind);
 				StartNewPhysics(remainingTime, Iterations);
 				return;
 			}
-			//custom
+			if (!Cast<ARailGrindRails>(Hit.GetActor())) {
+					safe_bCanRailGrind = true;
+			}
+			//custom End
 			if (IsValidLandingSpot(UpdatedComponent->GetComponentLocation(), Hit))
 			{
 				remainingTime += subTimeTickRemaining;
@@ -1518,6 +1614,7 @@ void UCustomMoveComponent::PhysFalling(float deltaTime, int32 Iterations)
 			}
 			else
 			{
+				UE_LOG(LogTemp, Warning, TEXT("HitSomething Cant Land"))
 				// Compute impact deflection based on final velocity, not integration step.
 				// This allows us to compute a new velocity from the deflected vector, and ensures the full gravity effect is included in the slide result.
 				Adjusted = Velocity * timeTick;
@@ -1564,6 +1661,7 @@ void UCustomMoveComponent::PhysFalling(float deltaTime, int32 Iterations)
 						}
 						else
 						{
+							//marjer
 							Velocity.Z = 0.f;
 							CalcVelocity(timeTick, FallingLateralFriction, false, MaxDecel);
 							VelocityNoAirControl = FVector(Velocity.X, Velocity.Y, OldVelocity.Z);
@@ -1580,7 +1678,13 @@ void UCustomMoveComponent::PhysFalling(float deltaTime, int32 Iterations)
 
 				const FVector OldHitNormal = Hit.Normal;
 				const FVector OldHitImpactNormal = Hit.ImpactNormal;
+				//CustomStart
+				//Overridden normal behavior
+				//FVector Delta = ComputeSlideVector(Adjusted, 1.f - Hit.Time, OldHitNormal, Hit);
+				FVector PostMoveVelocity2D = FVector(PostMoveVelocity.X, PostMoveVelocity.Y,0);
 				FVector Delta = ComputeSlideVector(Adjusted, 1.f - Hit.Time, OldHitNormal, Hit);
+				DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + Delta * 50, FColor::Blue, true);
+				//Custom End
 
 				// Compute velocity after deflection (only gravity component for RootMotion)
 				const UPrimitiveComponent* HitComponent = Hit.GetComponent();

@@ -35,8 +35,6 @@ public:
 	AXpCharacter(const FObjectInitializer& ObjectInitializer);
 
 	int count = 0;
-	
-	TArray<AActor*> GetRailGrindHitBoxOverlapped();
 
 protected:
 	// Called when the game starts or when spawned
@@ -65,8 +63,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Camera")
 	UCameraComponent* PlayerCamera;
 
-	UPROPERTY(BlueprintReadWrite)
-	UStaticMeshComponent* GrindRailHitBoxContainer;
 
 private:
 	UPROPERTY(EditDefaultsOnly)

@@ -11,6 +11,10 @@
     <None Include="..\..\Source\NewCppTutorialEditor.Target.cs">
       <Filter>Source</Filter>
     </None>
+    <None Include="..\..\.gitattributes" />
+    <None Include="..\..\.gitignore" />
+    <None Include="..\..\.vsconfig" />
+    <None Include="..\..\LICENSE.txt" />
     <Filter Include="Config">
       <UniqueIdentifier>{FA535FFB-25E1-3D20-B416-52F9BE21E06E}</UniqueIdentifier>
     </Filter>
@@ -119,7 +123,13 @@
     <Filter Include="Source\NewCppTutorial\Private">
       <UniqueIdentifier>{A5D3FE38-3533-3450-A1B2-DFF0C4566FF8}</UniqueIdentifier>
     </Filter>
+    <ClCompile Include="..\..\Source\NewCppTutorial\Private\CustomSplineMeshComponent.cpp">
+      <Filter>Source\NewCppTutorial\Private</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\NewCppTutorial\Private\GamePlayTagDefinitions.cpp">
+      <Filter>Source\NewCppTutorial\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\NewCppTutorial\Private\RailGrindingMovementMode.cpp">
       <Filter>Source\NewCppTutorial\Private</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\NewCppTutorial\Private\RailGrindRails.cpp">
@@ -131,7 +141,13 @@
     <Filter Include="Source\NewCppTutorial\Public">
       <UniqueIdentifier>{B5A88786-950C-3373-AE85-C202BA63E227}</UniqueIdentifier>
     </Filter>
+    <ClInclude Include="..\..\Source\NewCppTutorial\Public\CustomSplineMeshComponent.h">
+      <Filter>Source\NewCppTutorial\Public</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\NewCppTutorial\Public\GamePlayTagDefinitions.h">
+      <Filter>Source\NewCppTutorial\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\NewCppTutorial\Public\RailGrindingMovementMode.h">
       <Filter>Source\NewCppTutorial\Public</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\NewCppTutorial\Public\RailGrindRails.h">
