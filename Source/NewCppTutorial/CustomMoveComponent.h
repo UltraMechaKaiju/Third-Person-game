@@ -71,7 +71,12 @@ class NEWCPPTUTORIAL_API UCustomMoveComponent : public UCharacterMovementCompone
 	UPROPERTY(EditDefaultsOnly) float WallJumpOffForce = 200.f;
 	UPROPERTY(EditDefaultsOnly) float WallAttractionForce = 1000.f;
 	UPROPERTY(EditDefaultsOnly) UCurveFloat* WallRunGravityScaleCurve;
+
+	//RailGrindParams
 	UPROPERTY(EditDefaultsOnly) float RailGrindPulAwayAngleMax = 90;
+	UPROPERTY(EditDefaultsOnly) float AcceptableRadiansFromVertical = FMath::DegreesToRadians(10);
+	UPROPERTY(EditDefaultsOnly) float MaxLeaveRadians = FMath::DegreesToRadians(90);
+	UPROPERTY(EditDefaultsOnly) float CorrectionAllowance = FMath::DegreesToRadians(45);
 
 	//client side Flags
 

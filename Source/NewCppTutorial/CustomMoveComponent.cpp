@@ -170,7 +170,9 @@ bool UCustomMoveComponent::CanAttemptJump() const
 	return Super::CanAttemptJump() || IsWallRunning() || IsRailGrinding();
 }
 
-
+float DegreeDifVectorsRad(FVector A, FVector B) {
+	return FMath::Acos(FVector::DotProduct(A, B));
+}
 
 bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 {
@@ -190,7 +192,8 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 
 		float JumpVelZMax = JumpZVelocity * 1.5;
 		float JumpVelZMin = JumpZVelocity * .5;
-		float DesiredJumpZVel = Velocity.Z + JumpZVelocity;
+		float DesiredJumpZVel = FMath::Abs(Velocity.Z) + JumpZVelocity;
+		if (Velocity.Z < 0) { DesiredJumpZVel *= -1; }
 
 		FVector TotalJump = RailJumpDir * DesiredJumpZVel;
 
@@ -201,58 +204,42 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 
 		FVector RawPostJump = Velocity + TotalJump;
 		float FinalZVal = FMath::Clamp(RawPostJump.Z, JumpVelZMin, JumpVelZMax);
-		FVector FinalDir;
 
-		FVector RightCompare = PreJumpForwardVector.RotateAngleAxis(90, FVector::UpVector); /*Right Or Left?*/
+		float SplineFromVerticalRad = DegreeDifVectorsRad(Velocity.GetSafeNormal(), FVector::UpVector);
 
 		//Are we on a vertical rail?
-		float DotProductV = FVector::DotProduct(Velocity.GetSafeNormal(), FVector::UpVector);
-		float RadianDeltaV = FMath::Acos(DotProductV);
-		float DegreeDeltaV = FMath::RadiansToDegrees(RadianDeltaV);
+		if (SplineFromVerticalRad < AcceptableRadiansFromVertical || SplineFromVerticalRad > PI - AcceptableRadiansFromVertical) {/*We are on a Vertical rail*/
+			UE_LOG(LogTemp, Warning, TEXT("RailFlipOff"))
+			//Did the player use an acceptable input
+			FVector AcceptableAreaCenterLine = RailJumpDir.GetSafeNormal2D();
+			float DegreesFromCenterLineRad = DegreeDifVectorsRad(AcceptableAreaCenterLine, Acceleration.GetSafeNormal2D());
+
+			//debug
+			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + AcceptableAreaCenterLine * 50, FColor::Red, true);
+			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + AcceptableAreaCenterLine.RotateAngleAxis(90, FVector::UpVector) * 50, FColor::Blue, true);
+			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + AcceptableAreaCenterLine.RotateAngleAxisRad(MaxLeaveRadians + CorrectionAllowance, FVector::UpVector) * 50, FColor::Orange, true);
+			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + Acceleration.GetSafeNormal() * 50, FColor::Green, true);
 
 
-		//Backflip off if we are on a vertical rail
-		bool UnaccaptableAccelertation = false;
-		if (DegreeDeltaV < 10 || DegreeDeltaV > 170) {
-			UE_LOG(LogTemp, Warning, TEXT("Back/FrontFlip"))
-				//Did the player use an acceptable input
-
-				if (Acceleration.Size() != 0 && FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(RailJumpDir.GetSafeNormal2D(), Acceleration))) < 180) {
-					UE_LOG(LogTemp, Warning, TEXT("AcceptableAccel"))
-						float DefualtFlipZ = RailJumpDir.Z;
+			if (Acceleration.Size() != 0 && DegreesFromCenterLineRad < (MaxLeaveRadians + CorrectionAllowance)) {/*Player Is attempting to Choose their Leave Direction & their choice is Valid*/
+				if (DegreeDifVectorsRad(AcceptableAreaCenterLine, Acceleration) < MaxLeaveRadians) {/*Acceptable Without Correction*/
+					UE_LOG(LogTemp, Warning, TEXT("BFAcceptableAccel"))
 					RailJumpDir = Acceleration.GetSafeNormal() * (FVector(RailJumpDir.X, RailJumpDir.Y, 0).Size());
-					RailJumpDir.Z = DefualtFlipZ;
-					Velocity = RailJumpDir * PreJumpSpeed;
 				}
-			//Player Used an Unacceptable Input
-				else if (Acceleration.Size() != 0) {
-					float DegreesFromRight = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(RailJumpDir.GetSafeNormal2D().RotateAngleAxis(90, FVector::UpVector), Acceleration.GetSafeNormal())));
-					if (DegreesFromRight > 160) {
-						UE_LOG(LogTemp, Warning, TEXT("UnacceptableRight"))
-							float DefualtFlipZ = RailJumpDir.Z;
-						RailJumpDir = RailJumpDir.GetSafeNormal2D().RotateAngleAxis(270, FVector::UpVector) * (FVector(RailJumpDir.X, RailJumpDir.Y, 0).Size());
-						RailJumpDir.Z = DefualtFlipZ;
-						Velocity = RailJumpDir * PreJumpSpeed;
-					}
-					else if (DegreesFromRight < 20) {
-						UE_LOG(LogTemp, Warning, TEXT("UnacceptableLeft"))
-							float DefualtFlipZ = RailJumpDir.Z;
-						RailJumpDir = RailJumpDir.GetSafeNormal2D().RotateAngleAxis(90, FVector::UpVector) * (FVector(RailJumpDir.X, RailJumpDir.Y, 0).Size());
-						RailJumpDir.Z = DefualtFlipZ;
-						Velocity = RailJumpDir * PreJumpSpeed;
-					}
-					else {
-						UE_LOG(LogTemp, Warning, TEXT("UnacceptableDefault"))
-							UnaccaptableAccelertation = true;
-					}
+				else if (float RadiansFromRight = DegreeDifVectorsRad(AcceptableAreaCenterLine.RotateAngleAxis(90, FVector::UpVector), Acceleration.GetSafeNormal()) > (PI / 2)) {
+					UE_LOG(LogTemp, Warning, TEXT("BFCorrectableRight"))
+					RailJumpDir = RailJumpDir.GetSafeNormal2D().RotateAngleAxisRad(-MaxLeaveRadians, FVector::UpVector) * (FVector(RailJumpDir.X, RailJumpDir.Y, 0).Size());
 				}
-
-			//Player used no input or the input was unacceptable
-			if (Acceleration.Size() == 0 || UnaccaptableAccelertation) {
-				Velocity = (RailJumpDir.GetSafeNormal2D() * PreJumpSpeed);
-				Velocity.Z = JumpZVelocity;
+				else{
+					UE_LOG(LogTemp, Warning, TEXT("BFCorrectableLeft"))
+					RailJumpDir = RailJumpDir.GetSafeNormal2D().RotateAngleAxisRad(MaxLeaveRadians, FVector::UpVector) * (FVector(RailJumpDir.X, RailJumpDir.Y, 0).Size());
+				}
+					
 			}
-			UpdatedComponent->SetWorldRotation(Velocity.GetSafeNormal2D().Rotation().Quaternion());
+			Velocity = RailJumpDir * PreJumpSpeed;
+			Velocity.Z = JumpZVelocity;
+			FRotator NewRotation = UKismetMathLibrary::MakeRotFromXZ(RailJumpDir, FVector::UpVector);
+			UpdatedComponent->SetWorldRotation(NewRotation);
 			SetMovementMode(MOVE_Falling);
 			safe_bCanRailGrind = false;
 			return true;
@@ -269,7 +256,7 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 		FVector startForward = UpdatedComponent->GetForwardVector().GetSafeNormal2D();
 		if(Acceleration.Size() != 0){
 			UE_LOG(LogTemp, Warning, TEXT("Player Guided Rail Jump"))
-			if (FMath::Abs(FootLoc.Z - UpdatedComponent->GetComponentLocation().Z) < CapHH() * .5) {/*CharacterIs Leaning to the side to much to jump towards the rail; theyll just clip into it*/
+			if (FMath::Abs(FootLoc.Z - UpdatedComponent->GetComponentLocation().Z) < CapHH() * .5) {/*CharacterIs Leaning to the side to much to jump towards the rail; theyll just clip into it WRONG!*/
 				UE_LOG(LogTemp, Warning, TEXT("Leaning"))
 				if (FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(RailJumpDir.GetSafeNormal2D(), PreJumpForwardVector.GetSafeNormal2D()))) < 90) { /*Leaning Right Or Left?*/
 					DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + startForward.RotateAngleAxis(45, FVector::UpVector) * 50, FColor::Blue, true);
