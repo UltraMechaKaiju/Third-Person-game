@@ -170,6 +170,8 @@ bool UCustomMoveComponent::CanAttemptJump() const
 	return Super::CanAttemptJump() || IsWallRunning() || IsRailGrinding();
 }
 
+
+
 bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 {
 	bool bWasWallRunning = IsWallRunning();
@@ -1348,6 +1350,9 @@ void UCustomMoveComponent::PhysWalking(float deltaTime, int32 Iterations)
 			// try to move forward
 			MoveAlongFloor(MoveVelocity, timeTick, &StepDownResult);
 
+			FRotator WalkRotation = UKismetMathLibrary::MakeRotFromXZ(Velocity, FVector::UpVector);
+			UpdatedComponent->SetWorldRotation(WalkRotation);
+
 			if (IsFalling())
 			{
 				// pawn decided to jump up
@@ -1472,6 +1477,9 @@ void UCustomMoveComponent::PhysWalking(float deltaTime, int32 Iterations)
 			if (!bJustTeleported && !HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity() && timeTick >= MIN_TICK_TIME)
 			{
 				// TODO-RootMotionSource: Allow this to happen during partial override Velocity, but only set allowed axes?
+
+				//Should I update rotation here IDK
+
 				Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / timeTick;
 				MaintainHorizontalGroundVelocity();
 			}
@@ -1682,7 +1690,12 @@ void UCustomMoveComponent::PhysFalling(float deltaTime, int32 Iterations)
 
 		// Move
 		FHitResult Hit(1.f);
-		SafeMoveUpdatedComponent(Adjusted, PawnRotation, true, Hit);
+		FRotator OldRotation = UpdatedComponent->GetComponentRotation();
+		FRotator NewRotation;
+		FVector Adjusted2D = FVector(Adjusted.X, Adjusted.Y, 0);
+		if (Adjusted2D.Size() != 0) { NewRotation = UKismetMathLibrary::MakeRotFromXZ(Adjusted2D, FVector::UpVector); }
+		else { NewRotation = OldRotation; }
+		SafeMoveUpdatedComponent(Adjusted, NewRotation, true, Hit);
 		//Custom Start
 		FVector PostMoveVelocity = Velocity;
 		//Custom End
@@ -1714,7 +1727,7 @@ void UCustomMoveComponent::PhysFalling(float deltaTime, int32 Iterations)
 				StartNewPhysics(remainingTime, Iterations);
 				return;
 			}
-			if (!Cast<ARailGrindRails>(Hit.GetActor())) {
+			else if (!Cast<ARailGrindRails>(Hit.GetActor())) {
 					safe_bCanRailGrind = true;
 			}
 			//custom End
@@ -1815,7 +1828,11 @@ void UCustomMoveComponent::PhysFalling(float deltaTime, int32 Iterations)
 				if (subTimeTickRemaining > UE_KINDA_SMALL_NUMBER && (Delta | Adjusted) > 0.f)
 				{
 					// Move in deflected direction.
-					SafeMoveUpdatedComponent(Delta, PawnRotation, true, Hit);
+					FVector Delta2D = FVector(Delta.X, Delta.Y, 0);
+					if (Delta2D.Size() != 0) { NewRotation = UKismetMathLibrary::MakeRotFromXZ(Delta2D, FVector::UpVector); }
+					else { NewRotation = OldRotation; }
+					SafeMoveUpdatedComponent(Delta, NewRotation, true, Hit);
+
 
 					if (Hit.bBlockingHit)
 					{
