@@ -5,29 +5,11 @@
 			"guid": "00000000000000000000000000000000",
 			"description": "Default Uncontrolled Changelist",
 			"files": [
-				"D:/Unreal engine/NewCppTutorial/Content/StarterContent/Audio/Collapse01.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/Scenes/DefaultScene.umap",
-				"D:/Unreal engine/NewCppTutorial/Content/BluePrints/BP_CustomRailGrindRails.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/1/HO/EHBYGFFI1PRB9LM4FMK6MI.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/8/F8/I4QAO7DYUTL1Z8CFX4MD3W.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/9/9X/9YXY2ZJ2IH9DEIJNNM6NZ0.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/7/Y8/3DSMR1LYJ38TZ2KBCB8AVW.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/B/6K/ZV298H2SEW5L8R9LX2PX0K.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/D/94/35OTCBFVAPWI3ET091EUI7.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/6/0D/9Y8DHZYB3XDVWSW65HYEOB.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/9/O9/FJDI7KA0BFWK1MCARZTGZ2.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/6/V8/TJ7NUI0ELBJJBHCM49S500.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/StarterContent/Architecture/Floor_400x400.uasset",
 				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/8/XV/3OVYB5NUD80HQX0ATLBLNB.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/BluePrints/BP_CustomCharacter.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/6/EQ/JYA87CNERQFX05GVHCJAF7.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/3/N2/CU9HIF5F307O9X13JU83ZS.uasset",
 				"D:/Unreal engine/NewCppTutorial/Content/BluePrints/MyXpCharacter.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/1/U4/88J59PZHJLZXXQMTLUSVI6.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/BluePrints/BP_RailGrindRails.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/9/4S/RZ9DFN8VXQZG4LN9CSI0XP.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/9/G2/6NPHI29V72D7LD16MWQIJ2.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/E/YN/NSX7XJEELQ89TN1GAO0EYB.uasset",
-				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/8/DG/3FA5XH09DQQME1HSDC1ZFY.uasset"
+				"D:/Unreal engine/NewCppTutorial/Content/__ExternalActors__/Scenes/DefaultScene/3/N2/CU9HIF5F307O9X13JU83ZS.uasset",
+				"D:/Unreal engine/NewCppTutorial/Content/BluePrints/BP_RailGrindRails.uasset"
 			]
 		}
 	]

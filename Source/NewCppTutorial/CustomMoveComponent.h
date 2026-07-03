@@ -77,6 +77,7 @@ class NEWCPPTUTORIAL_API UCustomMoveComponent : public UCharacterMovementCompone
 	UPROPERTY(EditDefaultsOnly) float AcceptableRadiansFromVertical = FMath::DegreesToRadians(10);
 	UPROPERTY(EditDefaultsOnly) float MaxLeaveRadians = FMath::DegreesToRadians(90);
 	UPROPERTY(EditDefaultsOnly) float CorrectionAllowance = FMath::DegreesToRadians(45);
+	UPROPERTY(EditDefaultsOnly) float SignificantLeanThreshold = 10;
 
 	//client side Flags
 

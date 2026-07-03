@@ -204,6 +204,9 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 
 		FVector RawPostJump = Velocity + TotalJump;
 		float FinalZVal = FMath::Clamp(RawPostJump.Z, JumpVelZMin, JumpVelZMax);
+		FVector FinalDir;
+
+		FVector RightCompare = PreJumpForwardVector.RotateAngleAxis(90, FVector::UpVector); /*Right Or Left?*/
 
 		float SplineFromVerticalRad = DegreeDifVectorsRad(Velocity.GetSafeNormal(), FVector::UpVector);
 
@@ -251,10 +254,20 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 		//Should the player be able to jump to the left or right, or just one side?
 		FVector AcceptAreaCenterLine;
 		FVector FootLoc = UpdatedComponent->GetComponentLocation() - (UpdatedComponent->GetUpVector() * CapHH());
+
+		//Delete?
 		bool UnacceptableInput = false;
-		bool LeaningRight;
+
+		bool LeaningRight; UpdatedComponent->GetComponentRotation().Roll > 0 ? LeaningRight = true : LeaningRight = false;
+
 		FVector startForward = UpdatedComponent->GetForwardVector().GetSafeNormal2D();
-		if(Acceleration.Size() != 0){
+
+		bool bSignificantLean = FMath::Abs(UpdatedComponent->GetComponentRotation().Roll) > 90-SignificantLeanThreshold || FMath::Abs(UpdatedComponent->GetComponentRotation().Roll) < SignificantLeanThreshold;
+
+		if(Acceleration.Size() != 0){/*Player Is trying to choose their leave direction on a normal rail*/
+			
+
+
 			UE_LOG(LogTemp, Warning, TEXT("Player Guided Rail Jump"))
 			if (FMath::Abs(FootLoc.Z - UpdatedComponent->GetComponentLocation().Z) < CapHH() * .5) {/*CharacterIs Leaning to the side to much to jump towards the rail; theyll just clip into it WRONG!*/
 				UE_LOG(LogTemp, Warning, TEXT("Leaning"))
@@ -1088,7 +1101,7 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 		//Determine Direction To move for when you are moving and when you have no XY plane velocity
 		FVector ForwardToBeUsed = FVector::ZeroVector;
 		if (Velocity.GetSafeNormal2D() == FVector::ZeroVector) {
-			ForwardToBeUsed = (UpdatedComponent->GetComponentQuat()*FVector::ForwardVector).GetSafeNormal2D();
+			ForwardToBeUsed = (UpdatedComponent->GetComponentQuat() * FVector::ForwardVector).GetSafeNormal2D();
 		}
 		else {
 			ForwardToBeUsed = Velocity.GetSafeNormal2D();
@@ -1109,8 +1122,11 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 		//Calculate the final distance along the rail after movement
 
 		SelectedRailDistAlongFinal = (SelectedRailDistAlongStart)+((FVector(Velocity.X, Velocity.Y, 0).Length() * timeTick) * DirectionModifier);
+		
+		
+		SelectedRailDistAlongFinal = (SelectedRailDistAlongStart)+(5 * DirectionModifier);
 
-		SelectedRailDistAlongFinalClamped = FMath::Clamp(SelectedRailDistAlongFinal,0,SplineEndDistance);
+		SelectedRailDistAlongFinalClamped = FMath::Clamp(SelectedRailDistAlongFinal, 0, SplineEndDistance);
 		FVector SelectedRailLocationFinalClamped = SelectedSpline->GetLocationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
 		float SelectedRailDistAlongFinalDelta = SelectedRailDistAlongFinal - SelectedRailDistAlongFinalClamped;
 		float PercentOfTimeUsed = SelectedRailDistAlongFinalClamped / SelectedRailDistAlongFinal;
@@ -1138,33 +1154,70 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 				SelectedRailLocationFinalClamped = SelectedSpline->GetLocationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
 			}
 		}
-
-		//new
-		FVector RailRelativeUp = SelectedSpline->GetTransformAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World).GetUnitAxis(EAxis::Z);
-
-		FVector SelectedCharacterLocationFinal = SelectedRailLocationFinalClamped + RailRelativeUp.GetSafeNormal() * CapHH();
-		FVector NewMoveDelta = SelectedCharacterLocationFinal - UpdatedComponent->GetComponentLocation();
-
 		//Check if closest point is the end of the rail i.e you will immediately fall off and if so abort
-		if (DirectionModifier == 1 && (SelectedRailDistAlongStart == SplineEndDistance)  && !SelectedSpline->IsClosedLoop()|| DirectionModifier == -1 && (SelectedRailDistAlongStart == 0.f) && !SelectedSpline->IsClosedLoop()) {
+		if (DirectionModifier == 1 && (SelectedRailDistAlongStart == SplineEndDistance) && !SelectedSpline->IsClosedLoop() || DirectionModifier == -1 && (SelectedRailDistAlongStart == 0.f) && !SelectedSpline->IsClosedLoop()) {
 			SetMovementMode(MOVE_Falling);
 			UE_LOG(LogTemp, Warning, TEXT("Immediate Falloff"))
-			safe_bCanRailGrind = false;
+				safe_bCanRailGrind = false;
 			Safe_GrindRail = nullptr;
-			//seems unnessesary to change roation as neither velocity nor rotation have been changed by this point
-			UpdatedComponent->SetWorldRotation(Velocity.GetSafeNormal2D().Rotation().Quaternion());
-			StartNewPhysics(RemainingTime+timeTick, Iterations);
+			StartNewPhysics(RemainingTime + timeTick, Iterations);
 			return;
-		} 
+		}
 		
-		//FQuat NewRotation = SelectedSpline->GetTangentAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World).Rotation().Quaternion();
 
-		//FQuat NewRotation = SelectedSpline->GetRotationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World).Quaternion();
-		//FRotator NewRotation = SelectedSpline->GetRotationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
-		FRotator NewRotation = UKismetMathLibrary::MakeRotFromXZ(SelectedSpline->GetTangentAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World) * DirectionModifier, SelectedSpline->GetUpVectorAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World));
-		//if (DirectionModifier == -1) { NewRotation.Yaw += 180; }
 
-		SafeMoveUpdatedComponent(NewMoveDelta, NewRotation, false, RailGrindHit, ETeleportType::TeleportPhysics);
+		//Custom Implementaion of Roll iteration along spline
+		FVector curUpVector;
+		FVector curStartVector;
+		float numPoints = SelectedSpline->GetNumberOfSplinePoints();
+		float curDist = 0;
+
+		float inputKey = SelectedSpline->GetInputKeyValueAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped);
+		//UE_LOG(LogTemp, Warning, TEXT("InputKey is %f"), inputKey);
+		int lowerPoint = FMath::RoundToZero(inputKey);
+		if (lowerPoint == numPoints) { lowerPoint -= 1; } //if the input key is the last point use the previous point so the higher point isn't out of bounds
+		int higherPoint = lowerPoint+1;
+
+		float percentBetween = inputKey - lowerPoint;
+		//UE_LOG(LogTemp, Warning, TEXT("InputKey is %f"), percentBetween);
+		float startRoll = SelectedSpline->GetRollAtSplinePoint(lowerPoint, ESplineCoordinateSpace::World);
+		float endRoll = SelectedSpline->GetRollAtSplinePoint(higherPoint, ESplineCoordinateSpace::World);
+		float endRollOpp = endRoll < 0 ? 360 + endRoll : -360 + endRoll;
+		endRoll = FMath::Abs(startRoll - endRoll) > FMath::Abs(startRoll - endRollOpp) ? endRollOpp : endRoll;
+
+		//UE_LOG(LogTemp, Log, TEXT("StartRoll is %f"), startRoll);
+		//UE_LOG(LogTemp, Log, TEXT("EndRoll is %f"), endRoll);
+
+		//if (endRoll < 0) { UE_LOG(LogTemp, Warning, TEXT("NegativeEndRoll")) }
+		//else { UE_LOG(LogTemp, Warning, TEXT("PositiveEndRoll")) }
+
+		float CustomRoll = FMath::Lerp(startRoll,endRoll, percentBetween);
+		CustomRoll = CustomRoll < 0 ? 360 + CustomRoll : CustomRoll;
+
+		FVector FinalDir = SelectedSpline->GetDirectionAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
+		FinalDir *= DirectionModifier;
+		FRotator CustomNewRotation = UKismetMathLibrary::MakeRotFromXZ(FinalDir, FVector::UpVector);
+		CustomNewRotation.Roll = CustomRoll*DirectionModifier;
+		FVector customUpVector = UKismetMathLibrary::GetUpVector(CustomNewRotation);
+
+
+		//Decide Final location of character and move delta
+		FVector SelectedCharacterLocationFinal = SelectedRailLocationFinalClamped + customUpVector.GetSafeNormal() * CapHH();
+		FVector NewMoveDelta = SelectedCharacterLocationFinal - UpdatedComponent->GetComponentLocation();
+
+
+
+
+		//Debug
+		FVector virtualUp = FVector::UpVector.RotateAngleAxis(CustomRoll, FVector::BackwardVector);
+		FVector start = SelectedSpline->GetLocationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
+		DrawDebugLine(GetWorld(), start, start + virtualUp *200, FColor::Blue, true);
+		DrawDebugLine(GetWorld(), SelectedSpline->GetLocationAtSplinePoint(lowerPoint, ESplineCoordinateSpace::World), SelectedSpline->GetLocationAtSplinePoint(lowerPoint, ESplineCoordinateSpace::World) + FVector::UpVector * 200, FColor::Blue, false);
+		DrawDebugLine(GetWorld(), SelectedSpline->GetLocationAtSplinePoint(higherPoint, ESplineCoordinateSpace::World), SelectedSpline->GetLocationAtSplinePoint(higherPoint, ESplineCoordinateSpace::World) + FVector::UpVector * 200, FColor::Red, false);
+		//end Debug
+
+
+		SafeMoveUpdatedComponent(NewMoveDelta, CustomNewRotation, false, RailGrindHit, ETeleportType::TeleportPhysics);
 
 		//Do we have to fall off??
 
