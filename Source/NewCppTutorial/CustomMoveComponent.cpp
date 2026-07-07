@@ -188,196 +188,106 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 	if (bWasRailGrinding) {
 		UE_LOG(LogTemp, Warning, TEXT("RailGrindJump"));
 
-		FVector RailJumpDir = UpdatedComponent->GetUpVector();
-
-		float JumpVelZMax = JumpZVelocity * 1.5;
-		float JumpVelZMin = JumpZVelocity * .5;
-		float DesiredJumpZVel = FMath::Abs(Velocity.Z) + JumpZVelocity;
-		if (Velocity.Z < 0) { DesiredJumpZVel *= -1; }
-
-		FVector TotalJump = RailJumpDir * DesiredJumpZVel;
-
-		FVector PreJumpVelocity = Velocity;
-		float PreJumpSpeed = FVector(Velocity.X, Velocity.Y, 0).Size();
-		FVector PreJumpForwardVector = FVector(Velocity.X, Velocity.Y, 0).GetSafeNormal();
-		if (PreJumpForwardVector.Size() == 0) { PreJumpForwardVector = UpdatedComponent->GetUpVector(); }
-
-		FVector RawPostJump = Velocity + TotalJump;
-		float FinalZVal = FMath::Clamp(RawPostJump.Z, JumpVelZMin, JumpVelZMax);
+		FVector RailJumpDir;
+		FVector desiredLeaveDir = Acceleration.GetSafeNormal();
+		FVector PreJumpForwardVector3D = UpdatedComponent->GetForwardVector();
+		FVector PreJumpUpVector = UpdatedComponent->GetUpVector();
+		FVector PreJumpRightVector3D = UpdatedComponent->GetRightVector();
+		FVector PreJumpForwardVector = PreJumpForwardVector3D.GetSafeNormal2D();
+		FVector RightCompare = PreJumpForwardVector.RotateAngleAxis(90, FVector::UpVector).GetSafeNormal();
 		FVector FinalDir;
+		FVector AcceptableAreaCenterLine;
 
-		FVector RightCompare = PreJumpForwardVector.RotateAngleAxis(90, FVector::UpVector); /*Right Or Left?*/
+		float upsideDownMod = DegreeDifVectorsRad(FVector::UpVector, PreJumpUpVector) > .5 * PI ? -1 : 1;
+		float JumpVelZMax = JumpZVelocity * 2;
+		float JumpVelZMin = JumpZVelocity * .5;
+		float ZVelFromRail = Velocity.Z;
+		float PreJumpSpeed = Velocity.Size();
+		float DesiredJumpZVel = ZVelFromRail + (JumpZVelocity * upsideDownMod);
+		float SplineFromVerticalRad = DegreeDifVectorsRad(PreJumpForwardVector3D, FVector::UpVector);
+		float rightFromVerticalRad = DegreeDifVectorsRad(PreJumpRightVector3D, FVector::UpVector);
 
-		float SplineFromVerticalRad = DegreeDifVectorsRad(Velocity.GetSafeNormal(), FVector::UpVector);
-
-		//Are we on a vertical rail?
-		if (SplineFromVerticalRad < AcceptableRadiansFromVertical || SplineFromVerticalRad > PI - AcceptableRadiansFromVertical) {/*We are on a Vertical rail*/
-			UE_LOG(LogTemp, Warning, TEXT("RailFlipOff"))
-			//Did the player use an acceptable input
-			FVector AcceptableAreaCenterLine = RailJumpDir.GetSafeNormal2D();
-			float DegreesFromCenterLineRad = DegreeDifVectorsRad(AcceptableAreaCenterLine, Acceleration.GetSafeNormal2D());
-
-			//debug
-			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + AcceptableAreaCenterLine * 50, FColor::Red, true);
-			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + AcceptableAreaCenterLine.RotateAngleAxis(90, FVector::UpVector) * 50, FColor::Blue, true);
-			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + AcceptableAreaCenterLine.RotateAngleAxisRad(MaxLeaveRadians + CorrectionAllowance, FVector::UpVector) * 50, FColor::Orange, true);
-			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + Acceleration.GetSafeNormal() * 50, FColor::Green, true);
+		float useMaxLeaveRad;
+		float useCorrectionRad;
 
 
-			if (Acceleration.Size() != 0 && DegreesFromCenterLineRad < (MaxLeaveRadians + CorrectionAllowance)) {/*Player Is attempting to Choose their Leave Direction & their choice is Valid*/
-				if (DegreeDifVectorsRad(AcceptableAreaCenterLine, Acceleration) < MaxLeaveRadians) {/*Acceptable Without Correction*/
-					UE_LOG(LogTemp, Warning, TEXT("BFAcceptableAccel"))
-					RailJumpDir = Acceleration.GetSafeNormal() * (FVector(RailJumpDir.X, RailJumpDir.Y, 0).Size());
-				}
-				else if (float RadiansFromRight = DegreeDifVectorsRad(AcceptableAreaCenterLine.RotateAngleAxis(90, FVector::UpVector), Acceleration.GetSafeNormal()) > (PI / 2)) {
-					UE_LOG(LogTemp, Warning, TEXT("BFCorrectableRight"))
-					RailJumpDir = RailJumpDir.GetSafeNormal2D().RotateAngleAxisRad(-MaxLeaveRadians, FVector::UpVector) * (FVector(RailJumpDir.X, RailJumpDir.Y, 0).Size());
-				}
-				else{
-					UE_LOG(LogTemp, Warning, TEXT("BFCorrectableLeft"))
-					RailJumpDir = RailJumpDir.GetSafeNormal2D().RotateAngleAxisRad(MaxLeaveRadians, FVector::UpVector) * (FVector(RailJumpDir.X, RailJumpDir.Y, 0).Size());
-				}
-					
+		bool verticalRail = SplineFromVerticalRad < RGAcceptableRadiansFromVertical || SplineFromVerticalRad > PI - RGAcceptableRadiansFromVertical;
+		bool chooseAttempted = Acceleration.Size() != 0;
+		bool significantLean = rightFromVerticalRad <= RGSignificantLeanThreshold || rightFromVerticalRad >= PI - RGSignificantLeanThreshold ;
+		bool leanRight = DegreeDifVectorsRad(PreJumpUpVector, RightCompare) >= (PI / 2);
+		bool AccelAcceptable = false;
+
+		if(chooseAttempted){
+			if (verticalRail) {
+				AcceptableAreaCenterLine = PreJumpForwardVector;
+				useMaxLeaveRad = RGMaxLeaveRadians;
+				useCorrectionRad = RGCorrectionAllowance;
 			}
-			Velocity = RailJumpDir * PreJumpSpeed;
-			Velocity.Z = JumpZVelocity;
-			FRotator NewRotation = UKismetMathLibrary::MakeRotFromXZ(RailJumpDir, FVector::UpVector);
-			UpdatedComponent->SetWorldRotation(NewRotation);
-			SetMovementMode(MOVE_Falling);
-			safe_bCanRailGrind = false;
-			return true;
-		}
-
-		//if the player is trying to choose their leave direction on a normal rail
-
-		//Decide what the acceptable leave area is
-		//Should the player be able to jump to the left or right, or just one side?
-		FVector AcceptAreaCenterLine;
-		FVector FootLoc = UpdatedComponent->GetComponentLocation() - (UpdatedComponent->GetUpVector() * CapHH());
-
-		//Delete?
-		bool UnacceptableInput = false;
-
-		bool LeaningRight; UpdatedComponent->GetComponentRotation().Roll > 0 ? LeaningRight = true : LeaningRight = false;
-
-		FVector startForward = UpdatedComponent->GetForwardVector().GetSafeNormal2D();
-
-		bool bSignificantLean = FMath::Abs(UpdatedComponent->GetComponentRotation().Roll) > 90-SignificantLeanThreshold || FMath::Abs(UpdatedComponent->GetComponentRotation().Roll) < SignificantLeanThreshold;
-
-		if(Acceleration.Size() != 0){/*Player Is trying to choose their leave direction on a normal rail*/
-			
-
-
-			UE_LOG(LogTemp, Warning, TEXT("Player Guided Rail Jump"))
-			if (FMath::Abs(FootLoc.Z - UpdatedComponent->GetComponentLocation().Z) < CapHH() * .5) {/*CharacterIs Leaning to the side to much to jump towards the rail; theyll just clip into it WRONG!*/
-				UE_LOG(LogTemp, Warning, TEXT("Leaning"))
-				if (FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(RailJumpDir.GetSafeNormal2D(), PreJumpForwardVector.GetSafeNormal2D()))) < 90) { /*Leaning Right Or Left?*/
-					DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + startForward.RotateAngleAxis(45, FVector::UpVector) * 50, FColor::Blue, true);
-					AcceptAreaCenterLine = startForward.RotateAngleAxis(45, FVector::UpVector);
-					LeaningRight = true;
+			else if (significantLean) {
+				if (leanRight) {
+					AcceptableAreaCenterLine = PreJumpForwardVector.RotateAngleAxisRad(RGMaxLeaveRadiansLeaning/2, FVector::UpVector);
 				}
 				else {
-					DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + startForward.RotateAngleAxis(315, FVector::UpVector) * 50, FColor::Blue, true);
-					AcceptAreaCenterLine = startForward.RotateAngleAxis(315, FVector::UpVector);
-					LeaningRight = false;
+					AcceptableAreaCenterLine = PreJumpForwardVector.RotateAngleAxisRad(-(RGMaxLeaveRadiansLeaning / 2), FVector::UpVector);
 				}
-				if (FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(AcceptAreaCenterLine, Acceleration.GetSafeNormal()))) < 45) {/*acceptable without correction*/
-					RailJumpDir = (Acceleration.GetSafeNormal() * (FVector(RailJumpDir.X, RailJumpDir.Y, 0).Size()) * PreJumpSpeed);
-					RailJumpDir.Z += FinalZVal;
-					Velocity = RailJumpDir;
-				}
-				else if (FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(AcceptAreaCenterLine, Acceleration.GetSafeNormal()))) < 55) {/*Acceptable with correction(within 10degrees of acceptable area)*/
-					float DegreesFromForward = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(startForward, Acceleration.GetSafeNormal())));
-					if (DegreesFromForward < 10) {
-						//jump straight forward
-						RailJumpDir = startForward * PreJumpSpeed;
-						RailJumpDir.Z = FinalZVal;
-						Velocity = RailJumpDir;
-					}
-					else {
-						// Jump straight off to the side
-						float DefualtFlipZ = RailJumpDir.Z;
-						FVector SideLeaveAngle;
-						if (LeaningRight) { SideLeaveAngle = startForward.RotateAngleAxis(90, FVector::UpVector); } else { SideLeaveAngle = startForward.RotateAngleAxis(270, FVector::UpVector); }
-						RailJumpDir = SideLeaveAngle.GetSafeNormal2D() * PreJumpSpeed;
-						RailJumpDir.Z = FinalZVal;
-						Velocity = RailJumpDir;
-					}
-				}
-				else {
-					UnacceptableInput = true;
-				}
-				//if no case is met, continue of to the normal no input routine
+				useMaxLeaveRad = RGMaxLeaveRadiansLeaning;
+				useCorrectionRad = RGCorrectionAllowance;
 			}
 			else {
-				//180 degree rail jump
-				AcceptAreaCenterLine = UpdatedComponent->GetForwardVector().GetSafeNormal2D();
-				if (FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(AcceptAreaCenterLine, Acceleration.GetSafeNormal()))) < 90) {/*accept wihtou correction*/
-					RailJumpDir = Acceleration.GetSafeNormal() * PreJumpSpeed;
-					RailJumpDir.Z = FinalZVal;
-					Velocity = RailJumpDir;
+				AcceptableAreaCenterLine = PreJumpForwardVector.GetSafeNormal2D();
+				useMaxLeaveRad = RGMaxLeaveRadians;
+				useCorrectionRad = RGCorrectionAllowance;
+			}
+			AccelAcceptable = DegreeDifVectorsRad(AcceptableAreaCenterLine, desiredLeaveDir) < useMaxLeaveRad + useCorrectionRad;
+		}
+
+		if(AccelAcceptable){/*Player Is trying to choose their leave direction on a normal rail and their direction chosen can be used*/
+			UE_LOG(LogTemp, Warning, TEXT("Player Guided Rail Jump"))
+			if (DegreeDifVectorsRad(AcceptableAreaCenterLine, desiredLeaveDir) < useMaxLeaveRad) {/*acceptable without correction*/
+				RailJumpDir = desiredLeaveDir;
+			}
+			else {/*Acceptable with correction*/
+				FVector rightExtreme = AcceptableAreaCenterLine.RotateAngleAxisRad(useMaxLeaveRad, FVector::UpVector);
+				bool correctRight = DegreeDifVectorsRad(rightExtreme, desiredLeaveDir) <= RGCorrectionAllowance;
+				if (correctRight) {/*Jump to the right extreme*/
+					RailJumpDir = rightExtreme;
 				}
-				else if (FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(AcceptAreaCenterLine, Acceleration.GetSafeNormal()))) < 100) {/*acceptable with correction*/
-					if (FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(startForward.RotateAngleAxis(90, FVector::UpVector), Acceleration.GetSafeNormal()))) < 10) {
-						RailJumpDir = startForward.RotateAngleAxis(90, FVector::UpVector) * PreJumpSpeed;
-						RailJumpDir.Z = FinalZVal;
-						Velocity = RailJumpDir;
-					}
-					else {
-						RailJumpDir = startForward.RotateAngleAxis(270, FVector::UpVector) * PreJumpSpeed;
-						RailJumpDir.Z = FinalZVal;
-						Velocity = RailJumpDir;
-					}
+				else {/*Jump to left extreme*/
+					FVector leftExtreme = AcceptableAreaCenterLine.RotateAngleAxisRad(RGMaxLeaveRadians, FVector::UpVector);
+					RailJumpDir = leftExtreme;
+				}
+			}
+		}
+		else {/*player is jumping off the rail, without making a direction choice, or their choice is invalid*/
+			if (verticalRail) {
+				RailJumpDir = UpdatedComponent->GetUpVector().GetSafeNormal2D();
+			}
+			else if(significantLean) {/*Leaning one way or another*/
+				FVector rawJump = PreJumpUpVector * DesiredJumpZVel;
+				float rawJumpYEffectSize = FVector(rawJump.X, rawJump.Y, 0).Size();
+				if (leanRight) {
+					RailJumpDir = ((PreJumpForwardVector * PreJumpSpeed) + (-RightCompare * rawJumpYEffectSize)).GetSafeNormal2D();
 				}
 				else {
-					UnacceptableInput = true;
+					RailJumpDir = ((PreJumpForwardVector * PreJumpSpeed) + (RightCompare * rawJumpYEffectSize)).GetSafeNormal2D();
 				}
 			}
-			if (!UnacceptableInput) {
-				UpdatedComponent->SetWorldRotation(Velocity.GetSafeNormal2D().Rotation().Quaternion());
-				SetMovementMode(MOVE_Falling);
-				safe_bCanRailGrind = false;
-				return true;
+			else {/*normal case*/
+				RailJumpDir = PreJumpForwardVector;
 			}
 		}
-
-
-		//JumpOff routine if player does no input
-		float DegreeDelta = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(PreJumpForwardVector, RawPostJump.GetSafeNormal2D())));
-
-		//Normal Jump off cases
-		if (DegreeDelta > 170) {
-			//The Jump force has turned the character around, so they are facing the wrong direction
-			UE_LOG(LogTemp, Warning, TEXT("Case0"))
-			FinalDir = PreJumpVelocity.GetSafeNormal2D() * PreJumpSpeed;
-			FinalDir.Z = FinalZVal;
-		}
-		//elif The jump force has pointed the character to far to the left or right
-		else if (FMath::Abs(DegreeDelta) > RailGrindPulAwayAngleMax) {
-			float DotProductR = FVector::DotProduct(RightCompare, RawPostJump.GetSafeNormal2D());
-			float RadianDeltaR = FMath::Acos(DotProductR);
-			float DegreeDeltaR = FMath::RadiansToDegrees(RadianDeltaR);
-			if (FMath::Abs(DegreeDeltaR) > 90) {
-				UE_LOG(LogTemp, Warning, TEXT("Case1"))
-				FinalDir = PreJumpForwardVector.RotateAngleAxis(90, FVector::UpVector).GetSafeNormal2D() * PreJumpSpeed;
-				FinalDir.Z = FinalZVal;
-			}
-			else{
-				UE_LOG(LogTemp, Warning, TEXT("Case2"))
-				FinalDir = PreJumpForwardVector.RotateAngleAxis(270, FVector::UpVector).GetSafeNormal2D() * PreJumpSpeed;
-				FinalDir.Z = FinalZVal;
-			}
-		}
-		//JumpForce didn't create any issues
-		else {
-			FinalDir = RawPostJump.GetSafeNormal2D() * PreJumpSpeed;
-			FinalDir.Z = FinalZVal;
-		}
-		Velocity = FinalDir;
-
-		UpdatedComponent->SetWorldRotation(Velocity.GetSafeNormal2D().Rotation().Quaternion());
+		//execute jump
+		Velocity = RailJumpDir * PreJumpSpeed;
+		Velocity.Z = !verticalRail ? DesiredJumpZVel : JumpZVelocity;
+		FRotator NewRotation = UKismetMathLibrary::MakeRotFromXZ(RailJumpDir, FVector::UpVector);
+		UpdatedComponent->SetWorldRotation(NewRotation);
 		SetMovementMode(MOVE_Falling);
 		safe_bCanRailGrind = false;
+
+		//debug
+		if (significantLean) { UE_LOG(LogTemp, Warning, TEXT("sig lean")) } else if (verticalRail) { UE_LOG(LogTemp, Warning, TEXT("VerticalRail")) } else { UE_LOG(LogTemp, Warning, TEXT("Normal Jump")) }
+		if (upsideDownMod == -1) { UE_LOG(LogTemp, Warning, TEXT("upsideDown")) }
+
 		return true;
 	}
 	else {
@@ -1073,18 +983,20 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 
 
 		//Preform movement
-		ARailGrindRails* SelectedRail = nullptr;
-		USplineComponent* SelectedSpline = nullptr;
+		ARailGrindRails* SelectedRail;
+		USplineComponent* SelectedSpline;
 		float SelectedRailDistFrom;
 		float SelectedRailDistAlongStart;
 		float SelectedRailDistAlongFinal;
 		float SelectedRailDistAlongFinalClamped;
+		float prevSpeed = Velocity.Size();
 		FVector SelectedRailClosestLocation;
 		FVector CapsuleSplineDelta;
 		float SplineEndDistance;
 		FVector CapsuleBottomExt = UpdatedComponent->GetComponentLocation() - (UpdatedComponent->GetUpVector() * CapHH());
 
 		FHitResult RailGrindHit;
+
 
 
 		SelectedRail = Safe_GrindRail;
@@ -1121,10 +1033,10 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 
 		//Calculate the final distance along the rail after movement
 
-		SelectedRailDistAlongFinal = (SelectedRailDistAlongStart)+((FVector(Velocity.X, Velocity.Y, 0).Length() * timeTick) * DirectionModifier);
+		SelectedRailDistAlongFinal = (SelectedRailDistAlongStart)+((prevSpeed * DirectionModifier)*deltaTime);
 		
 		
-		SelectedRailDistAlongFinal = (SelectedRailDistAlongStart)+(5 * DirectionModifier);
+		//SelectedRailDistAlongFinal = (SelectedRailDistAlongStart)+(5 * DirectionModifier);
 
 		SelectedRailDistAlongFinalClamped = FMath::Clamp(SelectedRailDistAlongFinal, 0, SplineEndDistance);
 		FVector SelectedRailLocationFinalClamped = SelectedSpline->GetLocationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
@@ -1209,15 +1121,19 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 
 
 		//Debug
-		FVector virtualUp = FVector::UpVector.RotateAngleAxis(CustomRoll, FVector::BackwardVector);
-		FVector start = SelectedSpline->GetLocationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
-		DrawDebugLine(GetWorld(), start, start + virtualUp *200, FColor::Blue, true);
-		DrawDebugLine(GetWorld(), SelectedSpline->GetLocationAtSplinePoint(lowerPoint, ESplineCoordinateSpace::World), SelectedSpline->GetLocationAtSplinePoint(lowerPoint, ESplineCoordinateSpace::World) + FVector::UpVector * 200, FColor::Blue, false);
-		DrawDebugLine(GetWorld(), SelectedSpline->GetLocationAtSplinePoint(higherPoint, ESplineCoordinateSpace::World), SelectedSpline->GetLocationAtSplinePoint(higherPoint, ESplineCoordinateSpace::World) + FVector::UpVector * 200, FColor::Red, false);
+		//FVector virtualUp = FVector::UpVector.RotateAngleAxis(CustomRoll, FVector::BackwardVector);
+		//FVector start = SelectedSpline->GetLocationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
+		//DrawDebugLine(GetWorld(), start, start + virtualUp *200, FColor::Blue, true);
+		//DrawDebugLine(GetWorld(), SelectedSpline->GetLocationAtSplinePoint(lowerPoint, ESplineCoordinateSpace::World), SelectedSpline->GetLocationAtSplinePoint(lowerPoint, ESplineCoordinateSpace::World) + FVector::UpVector * 200, FColor::Blue, false);
+		//DrawDebugLine(GetWorld(), SelectedSpline->GetLocationAtSplinePoint(higherPoint, ESplineCoordinateSpace::World), SelectedSpline->GetLocationAtSplinePoint(higherPoint, ESplineCoordinateSpace::World) + FVector::UpVector * 200, FColor::Red, false);
 		//end Debug
 
 
 		SafeMoveUpdatedComponent(NewMoveDelta, CustomNewRotation, false, RailGrindHit, ETeleportType::TeleportPhysics);
+
+		//just set the velocity to what it actually is
+		FinalDir = UKismetMathLibrary::GetForwardVector(CustomNewRotation).GetSafeNormal();
+		Velocity = FinalDir * prevSpeed;
 
 		//Do we have to fall off??
 
@@ -1235,11 +1151,21 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 			return;
 		}
 
+		
+
+
+		
 		//The purpose of this part is to ensure the velocity Vector in the XY plane is always the same, while also making sure that adding in the z direction results in the correct direction along the spline 
-		FVector SplineFinalLocDirection = SelectedSpline->GetDirectionAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
-		float VelocityDirectionNormlaizer = FVector(Velocity.X, Velocity.Y, 0).Length() / FVector(SplineFinalLocDirection.X, SplineFinalLocDirection.Y, 0).Length();
-		Velocity = VelocityDirectionNormlaizer * SplineFinalLocDirection * DirectionModifier;
-		DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + Velocity, FColor::Blue, false);
+
+		//new impl
+		//float prevSpeed = FVector(Velocity.X, Velocity.Y, 0).Size();
+		//FVector FinalDir = UKismetMathLibrary::GetForwardVector(CustomNewRotation).GetSafeNormal();
+		//float normalZ= FinalDir.Z;
+		//float normalSize= FinalDir.GetSafeNormal2D().Size();
+
+		//float VelocityDirectionNormlaizer = FVector(Velocity.X, Velocity.Y, 0).Length() / FVector(SplineFinalLocDirection.X, SplineFinalLocDirection.Y, 0).Length();
+		//Velocity = VelocityDirectionNormlaizer * SplineFinalLocDirection * DirectionModifier;
+		//DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + Velocity, FColor::Blue, false);
 	}
 }
 
@@ -1763,6 +1689,8 @@ void UCustomMoveComponent::PhysFalling(float deltaTime, int32 Iterations)
 		{
 			if (Cast<ARailGrindRails>(Hit.GetActor()) && safe_bCanRailGrind) {
 				Safe_GrindRail = Cast<ARailGrindRails>(Hit.GetActor());
+				float XYSpeed = FVector(Velocity.X,Velocity.Y,0).Size();
+				Velocity = Velocity.X == 0 && Velocity.Y == 0 ? FVector::ZeroVector : Velocity.GetSafeNormal() * XYSpeed;
 				SetMovementMode(MOVE_Custom, CMOVE_RailGrind);
 				StartNewPhysics(remainingTime, Iterations);
 				return;

@@ -449,25 +449,29 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 #endif
 		static const UECodeGen_Private::FObjectPropertyParams NewProp_WallRunGravityScaleCurve;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_RailGrindPulAwayAngleMax_MetaData[];
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_RGPullAwayAngleMax_MetaData[];
 #endif
-		static const UECodeGen_Private::FFloatPropertyParams NewProp_RailGrindPulAwayAngleMax;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_RGPullAwayAngleMax;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_AcceptableRadiansFromVertical_MetaData[];
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_RGAcceptableRadiansFromVertical_MetaData[];
 #endif
-		static const UECodeGen_Private::FFloatPropertyParams NewProp_AcceptableRadiansFromVertical;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_RGAcceptableRadiansFromVertical;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_MaxLeaveRadians_MetaData[];
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_RGMaxLeaveRadians_MetaData[];
 #endif
-		static const UECodeGen_Private::FFloatPropertyParams NewProp_MaxLeaveRadians;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_RGMaxLeaveRadians;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_CorrectionAllowance_MetaData[];
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_RGMaxLeaveRadiansLeaning_MetaData[];
 #endif
-		static const UECodeGen_Private::FFloatPropertyParams NewProp_CorrectionAllowance;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_RGMaxLeaveRadiansLeaning;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_SignificantLeanThreshold_MetaData[];
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_RGCorrectionAllowance_MetaData[];
 #endif
-		static const UECodeGen_Private::FFloatPropertyParams NewProp_SignificantLeanThreshold;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_RGCorrectionAllowance;
+#if WITH_METADATA
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_RGSignificantLeanThreshold_MetaData[];
+#endif
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_RGSignificantLeanThreshold;
 #if WITH_METADATA
 		static const UECodeGen_Private::FMetaDataPairParam NewProp_CustomCharacterOwner_MetaData[];
 #endif
@@ -585,7 +589,7 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 #endif
 	const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve = { "WallRunGravityScaleCurve", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, WallRunGravityScaleCurve), Z_Construct_UClass_UCurveFloat_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve_MetaData) };
 #if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RailGrindPulAwayAngleMax_MetaData[] = {
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGPullAwayAngleMax_MetaData[] = {
 		{ "Category", "CustomMoveComponent" },
 #if !UE_BUILD_SHIPPING
 		{ "Comment", "//RailGrindParams\n" },
@@ -596,35 +600,54 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 #endif
 	};
 #endif
-	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RailGrindPulAwayAngleMax = { "RailGrindPulAwayAngleMax", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, RailGrindPulAwayAngleMax), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RailGrindPulAwayAngleMax_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RailGrindPulAwayAngleMax_MetaData) };
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGPullAwayAngleMax = { "RGPullAwayAngleMax", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, RGPullAwayAngleMax), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGPullAwayAngleMax_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGPullAwayAngleMax_MetaData) };
 #if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_AcceptableRadiansFromVertical_MetaData[] = {
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGAcceptableRadiansFromVertical_MetaData[] = {
 		{ "Category", "CustomMoveComponent" },
 		{ "ModuleRelativePath", "CustomMoveComponent.h" },
 	};
 #endif
-	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_AcceptableRadiansFromVertical = { "AcceptableRadiansFromVertical", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, AcceptableRadiansFromVertical), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_AcceptableRadiansFromVertical_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_AcceptableRadiansFromVertical_MetaData) };
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGAcceptableRadiansFromVertical = { "RGAcceptableRadiansFromVertical", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, RGAcceptableRadiansFromVertical), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGAcceptableRadiansFromVertical_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGAcceptableRadiansFromVertical_MetaData) };
 #if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MaxLeaveRadians_MetaData[] = {
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMaxLeaveRadians_MetaData[] = {
 		{ "Category", "CustomMoveComponent" },
 		{ "ModuleRelativePath", "CustomMoveComponent.h" },
 	};
 #endif
-	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MaxLeaveRadians = { "MaxLeaveRadians", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, MaxLeaveRadians), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MaxLeaveRadians_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MaxLeaveRadians_MetaData) };
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMaxLeaveRadians = { "RGMaxLeaveRadians", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, RGMaxLeaveRadians), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMaxLeaveRadians_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMaxLeaveRadians_MetaData) };
 #if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_CorrectionAllowance_MetaData[] = {
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMaxLeaveRadiansLeaning_MetaData[] = {
+		{ "Category", "CustomMoveComponent" },
+#if !UE_BUILD_SHIPPING
+		{ "Comment", "/*Max angle the player can modify their heading when jumping off a rail*/" },
+#endif
+		{ "ModuleRelativePath", "CustomMoveComponent.h" },
+#if !UE_BUILD_SHIPPING
+		{ "ToolTip", "Max angle the player can modify their heading when jumping off a rail" },
+#endif
+	};
+#endif
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMaxLeaveRadiansLeaning = { "RGMaxLeaveRadiansLeaning", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, RGMaxLeaveRadiansLeaning), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMaxLeaveRadiansLeaning_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMaxLeaveRadiansLeaning_MetaData) };
+#if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGCorrectionAllowance_MetaData[] = {
+		{ "Category", "CustomMoveComponent" },
+#if !UE_BUILD_SHIPPING
+		{ "Comment", "/*Max angle the player can modify their heading when jumping off a rail WHILE LEANING TO ONE SIDE OR THE OTHER*/" },
+#endif
+		{ "ModuleRelativePath", "CustomMoveComponent.h" },
+#if !UE_BUILD_SHIPPING
+		{ "ToolTip", "Max angle the player can modify their heading when jumping off a rail WHILE LEANING TO ONE SIDE OR THE OTHER" },
+#endif
+	};
+#endif
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGCorrectionAllowance = { "RGCorrectionAllowance", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, RGCorrectionAllowance), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGCorrectionAllowance_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGCorrectionAllowance_MetaData) };
+#if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGSignificantLeanThreshold_MetaData[] = {
 		{ "Category", "CustomMoveComponent" },
 		{ "ModuleRelativePath", "CustomMoveComponent.h" },
 	};
 #endif
-	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_CorrectionAllowance = { "CorrectionAllowance", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, CorrectionAllowance), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_CorrectionAllowance_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_CorrectionAllowance_MetaData) };
-#if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_SignificantLeanThreshold_MetaData[] = {
-		{ "Category", "CustomMoveComponent" },
-		{ "ModuleRelativePath", "CustomMoveComponent.h" },
-	};
-#endif
-	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_SignificantLeanThreshold = { "SignificantLeanThreshold", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, SignificantLeanThreshold), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_SignificantLeanThreshold_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_SignificantLeanThreshold_MetaData) };
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGSignificantLeanThreshold = { "RGSignificantLeanThreshold", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, RGSignificantLeanThreshold), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGSignificantLeanThreshold_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGSignificantLeanThreshold_MetaData) };
 #if WITH_METADATA
 	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_CustomCharacterOwner_MetaData[] = {
 		{ "ModuleRelativePath", "CustomMoveComponent.h" },
@@ -650,11 +673,12 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallJumpOffForce,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallAttractionForce,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RailGrindPulAwayAngleMax,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_AcceptableRadiansFromVertical,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MaxLeaveRadians,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_CorrectionAllowance,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_SignificantLeanThreshold,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGPullAwayAngleMax,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGAcceptableRadiansFromVertical,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMaxLeaveRadians,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMaxLeaveRadiansLeaning,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGCorrectionAllowance,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGSignificantLeanThreshold,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_CustomCharacterOwner,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_skateGravity,
 	};
@@ -700,9 +724,9 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 		{ ECustomMovementMode_StaticEnum, TEXT("ECustomMovementMode"), &Z_Registration_Info_UEnum_ECustomMovementMode, CONSTRUCT_RELOAD_VERSION_INFO(FEnumReloadVersionInfo, 295011779U) },
 	};
 	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo[] = {
-		{ Z_Construct_UClass_UCustomMoveComponent, UCustomMoveComponent::StaticClass, TEXT("UCustomMoveComponent"), &Z_Registration_Info_UClass_UCustomMoveComponent, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UCustomMoveComponent), 2698791285U) },
+		{ Z_Construct_UClass_UCustomMoveComponent, UCustomMoveComponent::StaticClass, TEXT("UCustomMoveComponent"), &Z_Registration_Info_UClass_UCustomMoveComponent, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UCustomMoveComponent), 1183015147U) },
 	};
-	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_1840481571(TEXT("/Script/NewCppTutorial"),
+	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_1820207289(TEXT("/Script/NewCppTutorial"),
 		Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo),
 		nullptr, 0,
 		Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::EnumInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::EnumInfo));

@@ -73,11 +73,12 @@ class NEWCPPTUTORIAL_API UCustomMoveComponent : public UCharacterMovementCompone
 	UPROPERTY(EditDefaultsOnly) UCurveFloat* WallRunGravityScaleCurve;
 
 	//RailGrindParams
-	UPROPERTY(EditDefaultsOnly) float RailGrindPulAwayAngleMax = 90;
-	UPROPERTY(EditDefaultsOnly) float AcceptableRadiansFromVertical = FMath::DegreesToRadians(10);
-	UPROPERTY(EditDefaultsOnly) float MaxLeaveRadians = FMath::DegreesToRadians(90);
-	UPROPERTY(EditDefaultsOnly) float CorrectionAllowance = FMath::DegreesToRadians(45);
-	UPROPERTY(EditDefaultsOnly) float SignificantLeanThreshold = 10;
+	UPROPERTY(EditDefaultsOnly) float RGPullAwayAngleMax = 90;
+	UPROPERTY(EditDefaultsOnly) float RGAcceptableRadiansFromVertical = FMath::DegreesToRadians(10);
+	UPROPERTY(EditDefaultsOnly) float RGMaxLeaveRadians = FMath::DegreesToRadians(90);/*Max angle the player can modify their heading when jumping off a rail*/
+	UPROPERTY(EditDefaultsOnly) float RGMaxLeaveRadiansLeaning = FMath::DegreesToRadians(45);/*Max angle the player can modify their heading when jumping off a rail WHILE LEANING TO ONE SIDE OR THE OTHER*/
+	UPROPERTY(EditDefaultsOnly) float RGCorrectionAllowance = FMath::DegreesToRadians(45);
+	UPROPERTY(EditDefaultsOnly) float RGSignificantLeanThreshold = FMath::DegreesToRadians(10);/*How far the player has to be leaning to one side or the other to be considered leaning*/
 
 	//client side Flags
 
