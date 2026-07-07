@@ -206,13 +206,9 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 		float DesiredJumpZVel = ZVelFromRail + (JumpZVelocity * upsideDownMod);
 		float SplineFromVerticalRad = DegreeDifVectorsRad(PreJumpForwardVector3D, FVector::UpVector);
 		float rightFromVerticalRad = DegreeDifVectorsRad(PreJumpRightVector3D, FVector::UpVector);
-		if (upsideDownMod == 1){
-			FMath::Clamp(DesiredJumpZVel, JumpVelZMin, JumpVelZMax);}
-		else {
-			FMath::Clamp(DesiredJumpZVel, -JumpVelZMax, JumpVelZMax);}
-
 		float useMaxLeaveRad;
 		float useCorrectionRad;
+		DesiredJumpZVel = upsideDownMod == 1 ? FMath::Clamp(DesiredJumpZVel, JumpVelZMin, JumpVelZMax) : FMath::Clamp(DesiredJumpZVel, -JumpVelZMax, JumpVelZMax);
 
 
 		bool verticalRail = SplineFromVerticalRad < RGAcceptableRadiansFromVertical || SplineFromVerticalRad > PI - RGAcceptableRadiansFromVertical;
