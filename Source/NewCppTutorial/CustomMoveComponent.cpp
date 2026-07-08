@@ -230,7 +230,7 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 					AcceptableAreaCenterLine = PreJumpForwardVector.RotateAngleAxisRad(useMaxLeaveRad, FVector::UpVector);
 				}
 				else {
-					AcceptableAreaCenterLine = PreJumpForwardVector.RotateAngleAxisRad(2*PI-useMaxLeaveRad, FVector::UpVector);
+					AcceptableAreaCenterLine = PreJumpForwardVector.RotateAngleAxisRad((2 * PI) - useMaxLeaveRad, FVector::UpVector);
 				}
 			}
 			else {
@@ -253,7 +253,7 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 					RailJumpDir = rightExtreme;
 				}
 				else {/*Jump to left extreme*/
-					FVector leftExtreme = AcceptableAreaCenterLine.RotateAngleAxisRad(RGMaxLeaveRadians, FVector::UpVector);
+					FVector leftExtreme = AcceptableAreaCenterLine.RotateAngleAxisRad(-useMaxLeaveRad, FVector::UpVector);
 					RailJumpDir = leftExtreme;
 				}
 			}
@@ -266,10 +266,10 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 				FVector rawJump = PreJumpUpVector * DesiredJumpZVel;
 				float rawJumpYEffectSize = FVector(rawJump.X, rawJump.Y, 0).Size();
 				if (leanRight) {
-					RailJumpDir = ((PreJumpForwardVector * PreJumpSpeed) + (-RightCompare * rawJumpYEffectSize)).GetSafeNormal2D();
+					RailJumpDir = ((PreJumpForwardVector * PreJumpSpeed) + (RightCompare * rawJumpYEffectSize)).GetSafeNormal2D();
 				}
 				else {
-					RailJumpDir = ((PreJumpForwardVector * PreJumpSpeed) + (RightCompare * rawJumpYEffectSize)).GetSafeNormal2D();
+					RailJumpDir = ((PreJumpForwardVector * PreJumpSpeed) + (-RightCompare * rawJumpYEffectSize)).GetSafeNormal2D();
 				}
 			}
 			else {/*normal case*/
@@ -287,20 +287,18 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 		//debug
 		if (significantLean) { UE_LOG(LogTemp, Warning, TEXT("sig lean")) } else if (verticalRail) { UE_LOG(LogTemp, Warning, TEXT("VerticalRail")) } else { UE_LOG(LogTemp, Warning, TEXT("Normal Jump")) }
 		if (upsideDownMod == -1) { UE_LOG(LogTemp, Warning, TEXT("upsideDown")) }
-		
+		if (leanRight) {UE_LOG(LogTemp, Warning, TEXT("Right"))}
+
 		FVector RightExtent = AcceptableAreaCenterLine.RotateAngleAxisRad(useMaxLeaveRad, FVector::UpVector);
 		FVector LeftExtent = AcceptableAreaCenterLine.RotateAngleAxisRad(-useMaxLeaveRad , FVector::UpVector);
 
-		DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + (RightCompare * 50), FColor::Black, true);
 		if (chooseAttempted)
 		{
 			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + (AcceptableAreaCenterLine.GetSafeNormal() * 50), FColor::Green, true);
 			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + (RightExtent.GetSafeNormal() * 50), FColor::Blue, true);
 			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + (LeftExtent.GetSafeNormal() * 50), FColor::Red, true);
 			
-			if (leanRight) {
-				UE_LOG(LogTemp, Warning, TEXT("Right"))
-			}
+			
 		}
 		
 
