@@ -198,7 +198,7 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 		FVector FinalDir;
 		FVector AcceptableAreaCenterLine;
 
-		float upsideDownMod = DegreeDifVectorsRad(FVector::UpVector, PreJumpUpVector) > .5 * PI ? -1 : 1;
+		float upsideDownMod = DegreeDifVectorsRad(FVector::UpVector, PreJumpUpVector) > .65 * PI ? -1 : 1;
 		float JumpVelZMax = JumpZVelocity * 2;
 		float JumpVelZMin = JumpZVelocity * .5;
 		float ZVelFromRail = Velocity.Z;
@@ -214,7 +214,7 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 		bool verticalRail = SplineFromVerticalRad < RGAcceptableRadiansFromVertical || SplineFromVerticalRad > PI - RGAcceptableRadiansFromVertical;
 		bool chooseAttempted = Acceleration.Size() != 0;
 		bool significantLean = rightFromVerticalRad <= RGSignificantLeanThreshold || rightFromVerticalRad >= PI - RGSignificantLeanThreshold ;
-		bool leanRight = DegreeDifVectorsRad(PreJumpUpVector, RightCompare) >= (PI / 2);
+		bool leanRight = DegreeDifVectorsRad(PreJumpUpVector.GetSafeNormal2D(), RightCompare) <= (PI / 2);
 		bool AccelAcceptable = false;
 
 		if(chooseAttempted){
@@ -224,14 +224,14 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 				useCorrectionRad = RGCorrectionAllowance;
 			}
 			else if (significantLean) {
-				if (leanRight) {
-					AcceptableAreaCenterLine = PreJumpForwardVector.RotateAngleAxisRad(RGMaxLeaveRadiansLeaning/2, FVector::UpVector);
-				}
-				else {
-					AcceptableAreaCenterLine = PreJumpForwardVector.RotateAngleAxisRad(-(RGMaxLeaveRadiansLeaning / 2), FVector::UpVector);
-				}
 				useMaxLeaveRad = RGMaxLeaveRadiansLeaning;
 				useCorrectionRad = RGCorrectionAllowance;
+				if (leanRight) {
+					AcceptableAreaCenterLine = PreJumpForwardVector.RotateAngleAxisRad(useMaxLeaveRad, FVector::UpVector);
+				}
+				else {
+					AcceptableAreaCenterLine = PreJumpForwardVector.RotateAngleAxisRad(2*PI-useMaxLeaveRad, FVector::UpVector);
+				}
 			}
 			else {
 				AcceptableAreaCenterLine = PreJumpForwardVector.GetSafeNormal2D();
@@ -287,6 +287,22 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 		//debug
 		if (significantLean) { UE_LOG(LogTemp, Warning, TEXT("sig lean")) } else if (verticalRail) { UE_LOG(LogTemp, Warning, TEXT("VerticalRail")) } else { UE_LOG(LogTemp, Warning, TEXT("Normal Jump")) }
 		if (upsideDownMod == -1) { UE_LOG(LogTemp, Warning, TEXT("upsideDown")) }
+		
+		FVector RightExtent = AcceptableAreaCenterLine.RotateAngleAxisRad(useMaxLeaveRad, FVector::UpVector);
+		FVector LeftExtent = AcceptableAreaCenterLine.RotateAngleAxisRad(-useMaxLeaveRad , FVector::UpVector);
+
+		DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + (RightCompare * 50), FColor::Black, true);
+		if (chooseAttempted)
+		{
+			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + (AcceptableAreaCenterLine.GetSafeNormal() * 50), FColor::Green, true);
+			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + (RightExtent.GetSafeNormal() * 50), FColor::Blue, true);
+			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + (LeftExtent.GetSafeNormal() * 50), FColor::Red, true);
+			
+			if (leanRight) {
+				UE_LOG(LogTemp, Warning, TEXT("Right"))
+			}
+		}
+		
 
 		return true;
 	}
