@@ -1048,9 +1048,6 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 		//Calculate the final distance along the rail after movement
 
 		SelectedRailDistAlongFinal = (SelectedRailDistAlongStart)+((prevSpeed * DirectionModifier)*deltaTime);
-		
-		
-		//SelectedRailDistAlongFinal = (SelectedRailDistAlongStart)+(5 * DirectionModifier);
 
 		SelectedRailDistAlongFinalClamped = FMath::Clamp(SelectedRailDistAlongFinal, 0, SplineEndDistance);
 		FVector SelectedRailLocationFinalClamped = SelectedSpline->GetLocationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
@@ -1080,16 +1077,20 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 				SelectedRailLocationFinalClamped = SelectedSpline->GetLocationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
 			}
 		}
+
+		//is this really needed? or is it ok to just let the rail re direct the player?
 		//Check if closest point is the end of the rail i.e you will immediately fall off and if so abort
+
+		/*
 		if (DirectionModifier == 1 && (SelectedRailDistAlongStart == SplineEndDistance) && !SelectedSpline->IsClosedLoop() || DirectionModifier == -1 && (SelectedRailDistAlongStart == 0.f) && !SelectedSpline->IsClosedLoop()) {
 			SetMovementMode(MOVE_Falling);
 			UE_LOG(LogTemp, Warning, TEXT("Immediate Falloff"))
-				safe_bCanRailGrind = false;
+			safe_bCanRailGrind = false;
 			Safe_GrindRail = nullptr;
 			StartNewPhysics(RemainingTime + timeTick, Iterations);
 			return;
 		}
-		
+		*/
 
 
 		//Custom Implementaion of Roll iteration along spline
@@ -1131,18 +1132,6 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 		FVector SelectedCharacterLocationFinal = SelectedRailLocationFinalClamped + customUpVector.GetSafeNormal() * CapHH();
 		FVector NewMoveDelta = SelectedCharacterLocationFinal - UpdatedComponent->GetComponentLocation();
 
-
-
-
-		//Debug
-		//FVector virtualUp = FVector::UpVector.RotateAngleAxis(CustomRoll, FVector::BackwardVector);
-		//FVector start = SelectedSpline->GetLocationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
-		//DrawDebugLine(GetWorld(), start, start + virtualUp *200, FColor::Blue, true);
-		//DrawDebugLine(GetWorld(), SelectedSpline->GetLocationAtSplinePoint(lowerPoint, ESplineCoordinateSpace::World), SelectedSpline->GetLocationAtSplinePoint(lowerPoint, ESplineCoordinateSpace::World) + FVector::UpVector * 200, FColor::Blue, false);
-		//DrawDebugLine(GetWorld(), SelectedSpline->GetLocationAtSplinePoint(higherPoint, ESplineCoordinateSpace::World), SelectedSpline->GetLocationAtSplinePoint(higherPoint, ESplineCoordinateSpace::World) + FVector::UpVector * 200, FColor::Red, false);
-		//end Debug
-
-
 		SafeMoveUpdatedComponent(NewMoveDelta, CustomNewRotation, false, RailGrindHit, ETeleportType::TeleportPhysics);
 
 		//just set the velocity to what it actually is
@@ -1152,34 +1141,29 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 		//Do we have to fall off??
 
 		if (DirectionModifier == 1 && (SelectedRailDistAlongFinal > SplineEndDistance) && !SelectedSpline->IsClosedLoop() || DirectionModifier == -1 && (SelectedRailDistAlongFinal < 0.f) && !SelectedSpline->IsClosedLoop()) {
-			//Loop to the start of the rail
-			
 			//jump off rail
-			Velocity = (SelectedSpline->GetDirectionAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World)) * (FVector(Velocity.X, Velocity.Y, 0).Length()) * DirectionModifier;
-			FRotator FinalRotation = Velocity.GetSafeNormal2D().Rotation();  if (DirectionModifier == -1) { FinalRotation.Yaw += 180; }
-			UpdatedComponent->SetWorldRotation(FinalRotation.Quaternion());
+			FRotator NewRotation;
+			float SplineFromVerticalRad = DegreeDifVectorsRad(UpdatedComponent->GetForwardVector(), FVector::UpVector);
+			bool verticalRail = SplineFromVerticalRad < RGAcceptableRadiansFromVertical || SplineFromVerticalRad > PI - RGAcceptableRadiansFromVertical;
+			if (verticalRail) {
+				NewRotation = UKismetMathLibrary::MakeRotFromXZ(UpdatedComponent->GetUpVector().GetSafeNormal2D(), FVector::UpVector);
+				UpdatedComponent->SetWorldRotation(NewRotation);
+			}
+			else {
+				FVector finalDir = UpdatedComponent->GetForwardVector().GetSafeNormal2D();
+				NewRotation = UKismetMathLibrary::MakeRotFromXZ(finalDir, FVector::UpVector);
+				UpdatedComponent->SetWorldRotation(NewRotation);
+				float velFromRail = Velocity.Z;
+				Velocity = finalDir * prevSpeed;
+				Velocity.Z = velFromRail;
+			}
+			UpdatedComponent->SetWorldRotation(NewRotation);
 			SetMovementMode(MOVE_Falling);
 			safe_bCanRailGrind = false;
 			Safe_GrindRail = nullptr;
 			StartNewPhysics(RemainingTime + timeTick - (timeTick * PercentOfTimeUsed), Iterations);
 			return;
 		}
-
-		
-
-
-		
-		//The purpose of this part is to ensure the velocity Vector in the XY plane is always the same, while also making sure that adding in the z direction results in the correct direction along the spline 
-
-		//new impl
-		//float prevSpeed = FVector(Velocity.X, Velocity.Y, 0).Size();
-		//FVector FinalDir = UKismetMathLibrary::GetForwardVector(CustomNewRotation).GetSafeNormal();
-		//float normalZ= FinalDir.Z;
-		//float normalSize= FinalDir.GetSafeNormal2D().Size();
-
-		//float VelocityDirectionNormlaizer = FVector(Velocity.X, Velocity.Y, 0).Length() / FVector(SplineFinalLocDirection.X, SplineFinalLocDirection.Y, 0).Length();
-		//Velocity = VelocityDirectionNormlaizer * SplineFinalLocDirection * DirectionModifier;
-		//DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + Velocity, FColor::Blue, false);
 	}
 }
 
