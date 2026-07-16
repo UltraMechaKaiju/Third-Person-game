@@ -290,6 +290,7 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 		safe_bCanRailGrind = false;
 
 		//debug
+		/*
 		if (significantLean) { UE_LOG(LogTemp, Warning, TEXT("sig lean")) } else if (verticalRail) { UE_LOG(LogTemp, Warning, TEXT("VerticalRail")) } else { UE_LOG(LogTemp, Warning, TEXT("Normal Jump")) }
 		if (upsideDownMod == -1) { UE_LOG(LogTemp, Warning, TEXT("upsideDown")) }
 		if (leanRight) {UE_LOG(LogTemp, Warning, TEXT("Right"))}
@@ -305,7 +306,7 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 			
 			
 		}
-		
+		*/
 
 		return true;
 	}
@@ -1040,17 +1041,12 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 			ForwardToBeUsed = Velocity.GetSafeNormal2D();
 		}
 
-		FVector SplineForward = SelectedSpline->GetDirectionAtDistanceAlongSpline(SelectedRailDistAlongStart, ESplineCoordinateSpace::World);
+		FVector SplineForwardStart = SelectedSpline->GetDirectionAtDistanceAlongSpline(SelectedRailDistAlongStart, ESplineCoordinateSpace::World).GetSafeNormal();
+		float SplineFromVerticalRad = DegreeDifVectorsRad(SplineForwardStart, FVector::UpVector);
+		bool verticalRail = SplineFromVerticalRad < RGAcceptableRadiansFromVertical || SplineFromVerticalRad > PI - RGAcceptableRadiansFromVertical;
 		int DirectionModifier;
 
-		if ((FMath::Acos(FVector::DotProduct(ForwardToBeUsed, SplineForward))) > (PI / 2)) {
-			DirectionModifier = -1;
-			//UE_LOG(LogTemp, Warning, TEXT("-1"))
-		}
-		else {
-			DirectionModifier = 1;
-			//UE_LOG(LogTemp, Warning, TEXT("1"))
-		}
+		DirectionModifier = verticalRail ? (DegreeDifVectorsRad(FVector(0, 0, Velocity.Z).GetSafeNormal(), SplineForwardStart) < PI/2 ? 1 : -1) : (DegreeDifVectorsRad(UpdatedComponent->GetForwardVector(), SplineForwardStart) < PI/2 ? 1 : -1);
 
 		//Calculate the final distance along the rail after movement
 
@@ -1140,8 +1136,6 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 		if (DirectionModifier == 1 && (SelectedRailDistAlongFinal > SplineEndDistance) && !SelectedSpline->IsClosedLoop() || DirectionModifier == -1 && (SelectedRailDistAlongFinal < 0.f) && !SelectedSpline->IsClosedLoop()) {
 			//jump off rail
 			FRotator NewRotation;
-			float SplineFromVerticalRad = DegreeDifVectorsRad(UpdatedComponent->GetForwardVector(), FVector::UpVector);
-			bool verticalRail = SplineFromVerticalRad < RGAcceptableRadiansFromVertical || SplineFromVerticalRad > PI - RGAcceptableRadiansFromVertical;
 			if (verticalRail) {
 				NewRotation = UKismetMathLibrary::MakeRotFromXZ(UpdatedComponent->GetUpVector().GetSafeNormal2D(), FVector::UpVector);
 				UpdatedComponent->SetWorldRotation(NewRotation);
