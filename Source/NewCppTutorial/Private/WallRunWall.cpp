@@ -6,11 +6,10 @@
 
 AWallRunWall::AWallRunWall()
 {
-	
 }
 
 void AWallRunWall::BeginPlay()
 {
 	Super::BeginPlay();
-	//GetStaticMeshComponent()->ComponentTags.Add("WallRunWall");
+	
 }

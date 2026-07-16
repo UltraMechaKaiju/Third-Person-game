@@ -21,6 +21,6 @@ public:
 	virtual void BeginPlay() override;
 
 protected:
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayTags")
-	FGameplayTagContainer WallRunWallTags;*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayTags")
+	FGameplayTagContainer WallRunWallTags;
 };

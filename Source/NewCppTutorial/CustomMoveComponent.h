@@ -33,7 +33,7 @@ class NEWCPPTUTORIAL_API UCustomMoveComponent : public UCharacterMovementCompone
 
 		//custom variables
 		ARailGrindRails* Saved_GrindRail;
-		
+		float Saved_GrindRailDistAlong;
 
 		//custom flags
 		uint8 saved_bCanRailGrind : 1;
@@ -79,6 +79,12 @@ class NEWCPPTUTORIAL_API UCustomMoveComponent : public UCharacterMovementCompone
 	UPROPERTY(EditDefaultsOnly) float RGMaxLeaveRadiansLeaning = FMath::DegreesToRadians(45);/*Max angle the player can modify their heading when jumping off a rail WHILE LEANING TO ONE SIDE OR THE OTHER*/
 	UPROPERTY(EditDefaultsOnly) float RGCorrectionAllowance = FMath::DegreesToRadians(45);
 	UPROPERTY(EditDefaultsOnly) float RGSignificantLeanThreshold = FMath::DegreesToRadians(10);/*How far the player has to be leaning to one side or the other to be considered leaning*/
+	UPROPERTY(EditDefaultsOnly) float RGMinSpeed = 100;
+
+	//DEBUG ONLY
+
+	float RGPrevDist;
+
 
 	//client side Flags
 
@@ -89,6 +95,8 @@ class NEWCPPTUTORIAL_API UCustomMoveComponent : public UCharacterMovementCompone
 	ARailGrindRails* Safe_GrindRail;
 
 	UStaticMeshComponent* RailGrindStaticMesh;
+	
+	float Safe_GrindRailDistAlong;
 	
 
 public:

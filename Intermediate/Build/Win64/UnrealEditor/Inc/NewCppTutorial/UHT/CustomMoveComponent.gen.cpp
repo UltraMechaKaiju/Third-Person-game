@@ -473,6 +473,10 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 #endif
 		static const UECodeGen_Private::FFloatPropertyParams NewProp_RGSignificantLeanThreshold;
 #if WITH_METADATA
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_RGMinSpeed_MetaData[];
+#endif
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_RGMinSpeed;
+#if WITH_METADATA
 		static const UECodeGen_Private::FMetaDataPairParam NewProp_CustomCharacterOwner_MetaData[];
 #endif
 		static const UECodeGen_Private::FObjectPropertyParams NewProp_CustomCharacterOwner;
@@ -649,6 +653,19 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 #endif
 	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGSignificantLeanThreshold = { "RGSignificantLeanThreshold", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, RGSignificantLeanThreshold), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGSignificantLeanThreshold_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGSignificantLeanThreshold_MetaData) };
 #if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMinSpeed_MetaData[] = {
+		{ "Category", "CustomMoveComponent" },
+#if !UE_BUILD_SHIPPING
+		{ "Comment", "/*How far the player has to be leaning to one side or the other to be considered leaning*/" },
+#endif
+		{ "ModuleRelativePath", "CustomMoveComponent.h" },
+#if !UE_BUILD_SHIPPING
+		{ "ToolTip", "How far the player has to be leaning to one side or the other to be considered leaning" },
+#endif
+	};
+#endif
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMinSpeed = { "RGMinSpeed", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, RGMinSpeed), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMinSpeed_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMinSpeed_MetaData) };
+#if WITH_METADATA
 	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_CustomCharacterOwner_MetaData[] = {
 		{ "ModuleRelativePath", "CustomMoveComponent.h" },
 	};
@@ -679,6 +696,7 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMaxLeaveRadiansLeaning,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGCorrectionAllowance,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGSignificantLeanThreshold,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMinSpeed,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_CustomCharacterOwner,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_skateGravity,
 	};
@@ -724,9 +742,9 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 		{ ECustomMovementMode_StaticEnum, TEXT("ECustomMovementMode"), &Z_Registration_Info_UEnum_ECustomMovementMode, CONSTRUCT_RELOAD_VERSION_INFO(FEnumReloadVersionInfo, 295011779U) },
 	};
 	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo[] = {
-		{ Z_Construct_UClass_UCustomMoveComponent, UCustomMoveComponent::StaticClass, TEXT("UCustomMoveComponent"), &Z_Registration_Info_UClass_UCustomMoveComponent, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UCustomMoveComponent), 1183015147U) },
+		{ Z_Construct_UClass_UCustomMoveComponent, UCustomMoveComponent::StaticClass, TEXT("UCustomMoveComponent"), &Z_Registration_Info_UClass_UCustomMoveComponent, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UCustomMoveComponent), 601724201U) },
 	};
-	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_1820207289(TEXT("/Script/NewCppTutorial"),
+	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_4035397605(TEXT("/Script/NewCppTutorial"),
 		Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo),
 		nullptr, 0,
 		Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::EnumInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::EnumInfo));

@@ -34,7 +34,8 @@ bool UCustomMoveComponent::FSavedMove_Custom::CanCombineWith(const FSavedMovePtr
 
 	if (saved_bCanRailGrind != NewSavedMove->saved_bCanRailGrind
 	|| Saved_bWallRunRight != NewSavedMove->Saved_bWallRunRight
-	/*|| Saved_GrindRailUId != NewSavedMove->Saved_GrindRailUId*/) {
+	|| Saved_GrindRail != NewSavedMove->Saved_GrindRail 
+	||Saved_GrindRailDistAlong != NewSavedMove->Saved_GrindRailDistAlong) {
 		return false;
 	}
 
@@ -50,7 +51,9 @@ void UCustomMoveComponent::FSavedMove_Custom::Clear()
 
 	Saved_bWallRunRight = 0;
 
-	/*Saved_GrindRailUId = 0;*/
+	Saved_GrindRail = 0;
+
+	Saved_GrindRailDistAlong = 0;
 }
 
 uint8 UCustomMoveComponent::FSavedMove_Custom::GetCompressedFlags() const
@@ -69,7 +72,8 @@ void UCustomMoveComponent::FSavedMove_Custom::SetMoveFor(ACharacter* C, float In
 
 	UCustomMoveComponent* CharacterMovementComp = Cast<UCustomMoveComponent>(C->GetCharacterMovement());
 	//Custom Variables
-	//Saved_GrindRailUId = CharacterMovementComp->Safe_GrindRailUId;
+	Saved_GrindRail = CharacterMovementComp->Safe_GrindRail;
+	Saved_GrindRailDistAlong = CharacterMovementComp->Safe_GrindRailDistAlong;
 
 	//Custom Flags
 	saved_bCanRailGrind = CharacterMovementComp->safe_bCanRailGrind;
@@ -82,7 +86,8 @@ void UCustomMoveComponent::FSavedMove_Custom::PrepMoveFor(ACharacter* C)
 
 	UCustomMoveComponent* CharacterMovementComp = Cast<UCustomMoveComponent>(C->GetCharacterMovement());
 	//custom variables
-	//CharacterMovementComp->Safe_GrindRailUId = Saved_GrindRailUId;
+	CharacterMovementComp->Safe_GrindRail = Saved_GrindRail;
+	CharacterMovementComp->Safe_GrindRailDistAlong = Saved_GrindRailDistAlong;
 
 	//custom flags
 	CharacterMovementComp->safe_bCanRailGrind = saved_bCanRailGrind;
@@ -219,7 +224,7 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 
 		if(chooseAttempted){
 			if (verticalRail) {
-				AcceptableAreaCenterLine = PreJumpForwardVector;
+				AcceptableAreaCenterLine = PreJumpUpVector.GetSafeNormal2D();
 				useMaxLeaveRad = RGMaxLeaveRadians;
 				useCorrectionRad = RGCorrectionAllowance;
 			}
@@ -422,7 +427,7 @@ bool UCustomMoveComponent::TryWallRun()
 
 	float DesiredDetectRadius = MinDetectRadius;
 
-	FVector TraceDirection = Velocity.GetSafeNormal2D() * CapR();
+	FVector TraceDirection = UpdatedComponent->GetForwardVector() * CapR();
 
 	//StartingPoints
 	FVector Start0L = Start + (TraceDirection * .25).RotateAngleAxis(90, FVector::DownVector);
@@ -439,19 +444,19 @@ bool UCustomMoveComponent::TryWallRun()
 
 	//LineTrace 1A
 	//Left Forward
-	if (GetWorld()->LineTraceSingleByProfile(A0, Start0L, Start0L + (TraceDirection * ScaleFactor0), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams())) {LeftHits.Add(A0); }
+	if (GetWorld()->LineTraceSingleByProfile(A0, Start0L, Start0L + (TraceDirection * ScaleFactor0), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams()) && Cast<AWallRunWall>(A0.GetActor())) { LeftHits.Add(A0); }
 	//left + 2
-	if (GetWorld()->LineTraceSingleByProfile(A1, Start2, Start2 + (TraceDirection * ScaleFactor2).RotateAngleAxis(90, FVector::DownVector), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams())) { LeftHits.Add(A1); }
+	if (GetWorld()->LineTraceSingleByProfile(A1, Start2, Start2 + (TraceDirection * ScaleFactor2).RotateAngleAxis(90, FVector::DownVector), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams()) && Cast<AWallRunWall>(A1.GetActor())) { LeftHits.Add(A1); }
 	//left + 1
-	if (GetWorld()->LineTraceSingleByProfile(A2, Start1, Start1 + (TraceDirection * ScaleFactor1).RotateAngleAxis(90, FVector::DownVector), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams())) { LeftHits.Add(A2); }
+	if (GetWorld()->LineTraceSingleByProfile(A2, Start1, Start1 + (TraceDirection * ScaleFactor1).RotateAngleAxis(90, FVector::DownVector), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams()) && Cast<AWallRunWall>(A2.GetActor())) { LeftHits.Add(A2); }
 	//left
-	if (GetWorld()->LineTraceSingleByProfile(A3, Start, Start + (TraceDirection * ScaleFactor3).RotateAngleAxis(90, FVector::DownVector), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams())) { LeftHits.Add(A3); }
+	if (GetWorld()->LineTraceSingleByProfile(A3, Start, Start + (TraceDirection * ScaleFactor3).RotateAngleAxis(90, FVector::DownVector), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams()) && Cast<AWallRunWall>(A3.GetActor())) { LeftHits.Add(A3); }
 
-	if (GetWorld()->LineTraceSingleByProfile(B0, Start0R, Start0R + (TraceDirection * ScaleFactor0), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams())) { RightHits.Add(B0); }
-	if (GetWorld()->LineTraceSingleByProfile(B1, Start1, Start1 + (TraceDirection * ScaleFactor1).RotateAngleAxis(270, FVector::DownVector), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams())) { RightHits.Add(B1); }
+	if (GetWorld()->LineTraceSingleByProfile(B0, Start0R, Start0R + (TraceDirection * ScaleFactor0), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams()) && Cast<AWallRunWall>(B0.GetActor())) { RightHits.Add(B0); }
+	if (GetWorld()->LineTraceSingleByProfile(B1, Start1, Start1 + (TraceDirection * ScaleFactor1).RotateAngleAxis(270, FVector::DownVector), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams()) && Cast<AWallRunWall>(B1.GetActor())) { RightHits.Add(B1); }
 	//Right
-	if (GetWorld()->LineTraceSingleByProfile(B2, Start2, Start2 + (TraceDirection * ScaleFactor2).RotateAngleAxis(270, FVector::DownVector), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams())) { RightHits.Add(B2); }
-	if (GetWorld()->LineTraceSingleByProfile(B3, Start, Start + (TraceDirection * ScaleFactor3).RotateAngleAxis(270, FVector::DownVector), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams())) { RightHits.Add(B3); }
+	if (GetWorld()->LineTraceSingleByProfile(B2, Start2, Start2 + (TraceDirection * ScaleFactor2).RotateAngleAxis(270, FVector::DownVector), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams()) && Cast<AWallRunWall>(B2.GetActor())) { RightHits.Add(B2); }
+	if (GetWorld()->LineTraceSingleByProfile(B3, Start, Start + (TraceDirection * ScaleFactor3).RotateAngleAxis(270, FVector::DownVector), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams()) && Cast<AWallRunWall>(B3.GetActor())) { RightHits.Add(B3); }
 
 	//if (WallRunLineTraceLength > 57) { UE_LOG(LogTemp, Warning, TEXT("Line Trace Length Error")); }
 
@@ -633,13 +638,18 @@ bool UCustomMoveComponent::TryWallRun()
 	//if (WallRunWall.Normal == FVector(0, 0, 0)) { UE_LOG(LogTemp, Warning, TEXT(" No Wall Passes")); return false; }
 #pragma endregion
 
+
+	float prevSpeed = FVector(Velocity.X, Velocity.Y, 0).Length();
+	FVector wallNormal = WallRunWall.Normal;
 	if (safe_bWallRunRight) {
-		Velocity = WallRunWall.Normal.RotateAngleAxis(90, FVector::UpVector) * FVector(Velocity.X, Velocity.Y, 0).Length();
+		Velocity = wallNormal.GetSafeNormal2D().RotateAngleAxis(90, FVector::UpVector) * prevSpeed;
+		UpdatedComponent->SetWorldRotation(UKismetMathLibrary::MakeRotFromXZ(Velocity.GetSafeNormal(), FVector::UpVector));
 		DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + WallRunWall.Normal * 500, FColor::Yellow, true, 1, 12);
 		if (Velocity == FVector(0, 0, 0)) { UE_LOG(LogTemp, Warning, TEXT(" Try Bug")) }
 	}
 	else {
-		Velocity = WallRunWall.Normal.RotateAngleAxis(270, FVector::UpVector) * FVector(Velocity.X, Velocity.Y, 0).Length();
+		Velocity = wallNormal.GetSafeNormal2D().RotateAngleAxis(270, FVector::UpVector) * prevSpeed;
+		UpdatedComponent->SetWorldRotation(UKismetMathLibrary::MakeRotFromXZ(Velocity.GetSafeNormal(), FVector::UpVector));
 		DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + WallRunWall.Normal * 500, FColor::Yellow, true, 1, 12);
 		if (Velocity == FVector(0, 0, 0)) { UE_LOG(LogTemp, Warning, TEXT("Try Bug")) }
 	}
@@ -741,6 +751,8 @@ bool UCustomMoveComponent::TryWallRunImp2(FHitResult Storedhit)
 
 
 	//LineTrace 1A
+
+
 	if (GetWorld()->LineTraceSingleByProfile(A1, Start, Start + TraceDirection.RotateAngleAxis(30, FVector::DownVector), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams())) { distances.Add(A1); }
 	if (GetWorld()->LineTraceSingleByProfile(A2, Start, Start + TraceDirection.RotateAngleAxis(90, FVector::DownVector), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams())) { distances.Add(A2); }
 	//if (GetWorld()->LineTraceSingleByProfile(A3, Start, Start + TraceDirection.RotateAngleAxis(150, FVector::DownVector), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams())) { distances.Add(A3); }
@@ -769,12 +781,12 @@ bool UCustomMoveComponent::TryWallRunImp2(FHitResult Storedhit)
 
 	if (!distances.IsEmpty()) {
 		UE_LOG(LogTemp, Warning, TEXT("not empty"))
-			for (size_t i = 0; i < distances.Num(); i++) {
-				if (/*distances[i].Normal.Z == 0*/ !distances[i].Normal.IsNearlyZero()) {
-					ChosenWallIndexNumber = i;
-					WallDetected = true;
-				}
+		for (size_t i = 0; i < distances.Num(); i++) {
+			if (distances[i].Normal.IsNearlyZero() && Cast<AWallRunWall>(distances[i].GetActor())) {
+				ChosenWallIndexNumber = i;
+				WallDetected = true;
 			}
+		}
 	}
 
 	if (WallDetected) {
@@ -819,9 +831,9 @@ void UCustomMoveComponent::PhysWallRun(float deltaTime, int32 Iterations)
 		
 
 		//General Params  for line trace implementation
-		float SinPullAwayAngle = FMath::Sin(FMath::DegreesToRadians(WallRunPullAwayAngle));
 		FVector Start = UpdatedComponent->GetComponentLocation();
-		FVector CastDelta = Velocity.GetSafeNormal().RotateAngleAxis(90, FVector::UpVector) * CapR()* 2;
+		//FVector CastDelta = Velocity.GetSafeNormal().RotateAngleAxis(90, FVector::UpVector) * CapR()* 2;
+		FVector CastDelta = UpdatedComponent->GetRightVector() * CapR()* 2;
 		FVector End = safe_bWallRunRight ? Start + CastDelta : Start - CastDelta;
 		auto Params = CustomCharacterOwner->GetIgnoreCharacterParams();
 		FHitResult WallHit;
@@ -829,7 +841,6 @@ void UCustomMoveComponent::PhysWallRun(float deltaTime, int32 Iterations)
 		GetWorld()->LineTraceSingleByProfile(WallHit, Start, End, "BlockAll", Params);
 		DrawDebugLine(GetWorld(), Start, End, FColor::Green, true, 0, 0);
 
-		
 
 #pragma endregion
 
@@ -864,7 +875,6 @@ void UCustomMoveComponent::PhysWallRun(float deltaTime, int32 Iterations)
 			StartNewPhysics(RemainingTime, Iterations);
 			return;
 		}
-		DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + MoveDirection * 50, FColor::Blue, true);
 
 		if (safe_bWallRunRight) {
 			Velocity = MoveDirection.RotateAngleAxis(90, FVector::UpVector) * FVector(Velocity.X,Velocity.Y,0).Length();
@@ -901,7 +911,6 @@ void UCustomMoveComponent::PhysWallRun(float deltaTime, int32 Iterations)
 			FHitResult WallAttractionHit;
 			FHitResult WallRunHit;
 			SafeMoveUpdatedComponent(Delta, UpdatedComponent->GetComponentQuat(), true, WallRunHit);
-			DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + Delta * 50, FColor::Blue, false, 1 / 60, 10, 1.25);
 			FVector WallAttractionDelta = -WallHit.Normal * WallAttractionForce * timeTick;
 			SafeMoveUpdatedComponent(WallAttractionDelta, Velocity.GetSafeNormal2D().Rotation().Quaternion(), true, WallAttractionHit);
 
@@ -936,7 +945,6 @@ void UCustomMoveComponent::PhysWallRun(float deltaTime, int32 Iterations)
 	FVector Start = UpdatedComponent->GetComponentLocation();
 	FVector CastDelta = Velocity.GetSafeNormal().RotateAngleAxis(90, FVector::UpVector) * CapR() * 2;
 	FVector End = safe_bWallRunRight ? Start + CastDelta : Start - CastDelta;
-	DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), safe_bWallRunRight ? UpdatedComponent->GetComponentLocation() + CastDelta * 5: UpdatedComponent->GetComponentLocation() - CastDelta * 5, FColor::Red, false, 1 / 60, 10, 1.5);
 	auto Params = CustomCharacterOwner->GetIgnoreCharacterParams();
 	FHitResult FloorHit, WallHit2;
 	GetWorld()->LineTraceSingleByProfile(WallHit2, Start, End, "BlockAll", Params);
@@ -999,13 +1007,11 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 		//Preform movement
 		ARailGrindRails* SelectedRail;
 		USplineComponent* SelectedSpline;
-		float SelectedRailDistFrom;
 		float SelectedRailDistAlongStart;
 		float SelectedRailDistAlongFinal;
 		float SelectedRailDistAlongFinalClamped;
 		float prevSpeed = Velocity.Size();
-		FVector SelectedRailClosestLocation;
-		FVector CapsuleSplineDelta;
+		float useSpeed;
 		float SplineEndDistance;
 		FVector CapsuleBottomExt = UpdatedComponent->GetComponentLocation() - (UpdatedComponent->GetUpVector() * CapHH());
 
@@ -1015,11 +1021,12 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 
 		SelectedRail = Safe_GrindRail;
 		//Define Variables
-		SelectedRailDistFrom = (CapsuleBottomExt - SelectedRail->GetGrindSplineClosestLocation(CapsuleBottomExt)).Length();
-		SelectedRailClosestLocation = SelectedRail->GetGrindSplineClosestLocation(CapsuleBottomExt);
-		CapsuleSplineDelta = (SelectedRail->GetGrindSplineClosestLocation(CapsuleBottomExt) - CapsuleBottomExt);
 		SelectedSpline = SelectedRail->GrindRail;
-		SelectedRailDistAlongStart = SelectedSpline->GetDistanceAlongSplineAtLocation(SelectedRailClosestLocation, ESplineCoordinateSpace::World);
+		SelectedRailDistAlongStart = Safe_GrindRailDistAlong;
+
+		//debug only
+		if (RGPrevDist != SelectedRailDistAlongStart && RGPrevDist != NULL) { float DistDelta = RGPrevDist - SelectedRailDistAlongStart; UE_LOG(LogTemp, Warning, TEXT("Dist Not Match: %f"), DistDelta); }
+
 		SplineEndDistance = SelectedSpline->GetSplineLength();
 		//RailHasBeen Selected
 		//If the player is far from the rail, Take into account the distance from the rail 
@@ -1047,7 +1054,9 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 
 		//Calculate the final distance along the rail after movement
 
-		SelectedRailDistAlongFinal = (SelectedRailDistAlongStart)+((prevSpeed * DirectionModifier)*deltaTime);
+
+		useSpeed = prevSpeed < RGMinSpeed ? RGMinSpeed : prevSpeed;
+		SelectedRailDistAlongFinal = (SelectedRailDistAlongStart)+((useSpeed * DirectionModifier)*deltaTime);
 
 		SelectedRailDistAlongFinalClamped = FMath::Clamp(SelectedRailDistAlongFinal, 0, SplineEndDistance);
 		FVector SelectedRailLocationFinalClamped = SelectedSpline->GetLocationAtDistanceAlongSpline(SelectedRailDistAlongFinalClamped, ESplineCoordinateSpace::World);
@@ -1078,19 +1087,7 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 			}
 		}
 
-		//is this really needed? or is it ok to just let the rail re direct the player?
-		//Check if closest point is the end of the rail i.e you will immediately fall off and if so abort
-
-		/*
-		if (DirectionModifier == 1 && (SelectedRailDistAlongStart == SplineEndDistance) && !SelectedSpline->IsClosedLoop() || DirectionModifier == -1 && (SelectedRailDistAlongStart == 0.f) && !SelectedSpline->IsClosedLoop()) {
-			SetMovementMode(MOVE_Falling);
-			UE_LOG(LogTemp, Warning, TEXT("Immediate Falloff"))
-			safe_bCanRailGrind = false;
-			Safe_GrindRail = nullptr;
-			StartNewPhysics(RemainingTime + timeTick, Iterations);
-			return;
-		}
-		*/
+		Safe_GrindRailDistAlong = SelectedRailDistAlongFinalClamped;
 
 
 		//Custom Implementaion of Roll iteration along spline
@@ -1136,7 +1133,7 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 
 		//just set the velocity to what it actually is
 		FinalDir = UKismetMathLibrary::GetForwardVector(CustomNewRotation).GetSafeNormal();
-		Velocity = FinalDir * prevSpeed;
+		Velocity = FinalDir * useSpeed;
 
 		//Do we have to fall off??
 
@@ -1154,7 +1151,7 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 				NewRotation = UKismetMathLibrary::MakeRotFromXZ(finalDir, FVector::UpVector);
 				UpdatedComponent->SetWorldRotation(NewRotation);
 				float velFromRail = Velocity.Z;
-				Velocity = finalDir * prevSpeed;
+				Velocity = finalDir * useSpeed;
 				Velocity.Z = velFromRail;
 			}
 			UpdatedComponent->SetWorldRotation(NewRotation);
@@ -1686,9 +1683,15 @@ void UCustomMoveComponent::PhysFalling(float deltaTime, int32 Iterations)
 		else if (Hit.bBlockingHit)
 		{
 			if (Cast<ARailGrindRails>(Hit.GetActor()) && safe_bCanRailGrind) {
-				Safe_GrindRail = Cast<ARailGrindRails>(Hit.GetActor());
+				ARailGrindRails* SelectedRail = Cast<ARailGrindRails>(Hit.GetActor());
+				Safe_GrindRail = SelectedRail;
 				float XYSpeed = FVector(Velocity.X,Velocity.Y,0).Size();
 				Velocity = Velocity.X == 0 && Velocity.Y == 0 ? FVector::ZeroVector : Velocity.GetSafeNormal() * XYSpeed;
+
+				FVector FootLocation = UpdatedComponent->GetComponentLocation() - (UpdatedComponent->GetUpVector() * CapHH());
+				float closestDistAlong = SelectedRail->GrindRail->GetDistanceAlongSplineAtLocation(FootLocation, ESplineCoordinateSpace::World);
+				Safe_GrindRailDistAlong = closestDistAlong;
+
 				SetMovementMode(MOVE_Custom, CMOVE_RailGrind);
 				StartNewPhysics(remainingTime, Iterations);
 				return;
