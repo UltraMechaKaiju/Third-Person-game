@@ -325,7 +325,7 @@ void UCustomMoveComponent::UpdateCharacterStateBeforeMovement(float DeltaSeconds
 		safe_bCanRailGrind = true;
 	}
 	if (IsFalling()) {
-		TryWallRun();
+		//TryWallRun();
 	}
 
 	Super::UpdateCharacterStateBeforeMovement(DeltaSeconds);
@@ -1686,12 +1686,36 @@ void UCustomMoveComponent::PhysFalling(float deltaTime, int32 Iterations)
 				float closestDistAlong = SelectedRail->GrindRail->GetDistanceAlongSplineAtLocation(FootLocation, ESplineCoordinateSpace::World);
 				Safe_GrindRailDistAlong = closestDistAlong;
 
+				remainingTime += subTimeTickRemaining;
 				SetMovementMode(MOVE_Custom, CMOVE_RailGrind);
 				StartNewPhysics(remainingTime, Iterations);
 				return;
 			}
 			else if (!Cast<ARailGrindRails>(Hit.GetActor())) {
 					safe_bCanRailGrind = true;
+			}
+			if (Cast<AWallRunWall>(Hit.GetActor())) {
+				UE_LOG(LogTemp, Warning, TEXT("attempt wall run"))
+				FHitResult wallRunHit;
+				FVector impactPointDelta = Hit.ImpactPoint - UpdatedComponent->GetComponentLocation();
+				FVector flattenedDelta = FVector(impactPointDelta.X, impactPointDelta.Y, 0);
+				GetWorld()->LineTraceSingleByProfile(wallRunHit, UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + (flattenedDelta + flattenedDelta.GetSafeNormal()), "BlockAll", CustomCharacterOwner->GetIgnoreCharacterParams());
+				if (wallRunHit.bBlockingHit && Cast<AWallRunWall>(wallRunHit.GetActor())) {
+					//enter wall run
+					UE_LOG(LogTemp, Warning, TEXT("enter wall run"))
+					safe_bWallRunRight = DegreeDifVectorsRad(flattenedDelta, UpdatedComponent->GetRightVector()) < PI / 2 ? true : false;
+
+					FVector WRStartLocation = wallRunHit.ImpactPoint + (wallRunHit.ImpactNormal * CapR());
+					FVector WRStartForward = safe_bWallRunRight ? wallRunHit.ImpactNormal.GetSafeNormal2D().RotateAngleAxis(90, FVector::UpVector) : wallRunHit.ImpactNormal.GetSafeNormal2D().RotateAngleAxis(270, FVector::UpVector);
+					FRotator WRStartRotation = UKismetMathLibrary::MakeRotFromXZ(WRStartForward, FVector::UpVector);
+					UpdatedComponent->SetWorldLocationAndRotation(WRStartLocation, WRStartRotation);
+
+					UE_LOG(LogTemp, Warning, TEXT("WallRunRight: %s"), safe_bWallRunRight ? TEXT("true") : TEXT("false"))
+					remainingTime += subTimeTickRemaining;
+					SetMovementMode(MOVE_Custom, CMOVE_WallRun);
+					StartNewPhysics(remainingTime, Iterations);
+					return;
+				}
 			}
 			//custom End
 			if (IsValidLandingSpot(UpdatedComponent->GetComponentLocation(), Hit))
