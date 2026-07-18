@@ -71,6 +71,8 @@ class NEWCPPTUTORIAL_API UCustomMoveComponent : public UCharacterMovementCompone
 	UPROPERTY(EditDefaultsOnly) float WallJumpOffForce = 200.f;
 	UPROPERTY(EditDefaultsOnly) float WallAttractionForce = 1000.f;
 	UPROPERTY(EditDefaultsOnly) UCurveFloat* WallRunGravityScaleCurve;
+	UPROPERTY(EditDefaultsOnly) int WRMinLeaveAngle = 20;
+	UPROPERTY(EditDefaultsOnly) int WRMaxLeaveAngle = 80;
 
 	//RailGrindParams
 	UPROPERTY(EditDefaultsOnly) float RGPullAwayAngleMax = 90;

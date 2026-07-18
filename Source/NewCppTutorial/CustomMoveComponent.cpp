@@ -187,8 +187,28 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 
 	if (bWasWallRunning) {
 		Super::DoJump(bReplayingMoves);
-		safe_bWallRunRight ? Velocity = Velocity.RotateAngleAxis(360 - 45, FVector::UpVector) : Velocity = Velocity.RotateAngleAxis(45, FVector::UpVector);
-		return true;
+
+		float prevSpeed = FVector(Velocity.X, Velocity.Y, 0).Size();
+
+		float areaHalfSize = (WRMaxLeaveAngle - WRMinLeaveAngle) / 2;
+		float centerLineDegrees = WRMinLeaveAngle + areaHalfSize ;
+		FVector acceptableAreCenterline = UpdatedComponent->GetForwardVector().RotateAngleAxis((safe_bWallRunRight ? -centerLineDegrees : centerLineDegrees), FVector::UpVector);
+		FVector realtiveRight = acceptableAreCenterline.RotateAngleAxis(90, FVector::UpVector);
+		FVector desiredLeaveVector = Acceleration.Size() != 0 ? Acceleration.GetSafeNormal() : acceptableAreCenterline;
+		bool desiredAcceptable = DegreeDifVectorsRad(acceptableAreCenterline, desiredLeaveVector) < FMath::DegreesToRadians(areaHalfSize);
+		
+		if (desiredAcceptable) {
+			Velocity = (desiredLeaveVector * prevSpeed) + (FVector::UpVector * Velocity.Z);
+		}
+		else {
+			bool extremeOutside = DegreeDifVectorsRad(desiredLeaveVector, (safe_bWallRunRight ? realtiveRight : -realtiveRight)) < PI / 2;
+			float finalDirectionDegrees = extremeOutside ? WRMinLeaveAngle : WRMaxLeaveAngle;
+			finalDirectionDegrees = safe_bWallRunRight ? -finalDirectionDegrees : finalDirectionDegrees;
+			FVector finalDirection = UpdatedComponent->GetForwardVector().RotateAngleAxis(finalDirectionDegrees, FVector::UpVector);
+			Velocity = (finalDirection * prevSpeed) + (FVector::UpVector * Velocity.Z);
+		}
+
+
 	}
 	if (bWasRailGrinding) {
 		UE_LOG(LogTemp, Warning, TEXT("RailGrindJump"));

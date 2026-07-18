@@ -449,6 +449,14 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 #endif
 		static const UECodeGen_Private::FObjectPropertyParams NewProp_WallRunGravityScaleCurve;
 #if WITH_METADATA
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_WRMinLeaveAngle_MetaData[];
+#endif
+		static const UECodeGen_Private::FIntPropertyParams NewProp_WRMinLeaveAngle;
+#if WITH_METADATA
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_WRMaxLeaveAngle_MetaData[];
+#endif
+		static const UECodeGen_Private::FIntPropertyParams NewProp_WRMaxLeaveAngle;
+#if WITH_METADATA
 		static const UECodeGen_Private::FMetaDataPairParam NewProp_RGPullAwayAngleMax_MetaData[];
 #endif
 		static const UECodeGen_Private::FFloatPropertyParams NewProp_RGPullAwayAngleMax;
@@ -593,6 +601,20 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 #endif
 	const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve = { "WallRunGravityScaleCurve", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, WallRunGravityScaleCurve), Z_Construct_UClass_UCurveFloat_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve_MetaData) };
 #if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinLeaveAngle_MetaData[] = {
+		{ "Category", "CustomMoveComponent" },
+		{ "ModuleRelativePath", "CustomMoveComponent.h" },
+	};
+#endif
+	const UECodeGen_Private::FIntPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinLeaveAngle = { "WRMinLeaveAngle", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Int, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, WRMinLeaveAngle), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinLeaveAngle_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinLeaveAngle_MetaData) };
+#if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMaxLeaveAngle_MetaData[] = {
+		{ "Category", "CustomMoveComponent" },
+		{ "ModuleRelativePath", "CustomMoveComponent.h" },
+	};
+#endif
+	const UECodeGen_Private::FIntPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMaxLeaveAngle = { "WRMaxLeaveAngle", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Int, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, WRMaxLeaveAngle), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMaxLeaveAngle_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMaxLeaveAngle_MetaData) };
+#if WITH_METADATA
 	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGPullAwayAngleMax_MetaData[] = {
 		{ "Category", "CustomMoveComponent" },
 #if !UE_BUILD_SHIPPING
@@ -690,6 +712,8 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallJumpOffForce,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallAttractionForce,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinLeaveAngle,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMaxLeaveAngle,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGPullAwayAngleMax,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGAcceptableRadiansFromVertical,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMaxLeaveRadians,
@@ -742,9 +766,9 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 		{ ECustomMovementMode_StaticEnum, TEXT("ECustomMovementMode"), &Z_Registration_Info_UEnum_ECustomMovementMode, CONSTRUCT_RELOAD_VERSION_INFO(FEnumReloadVersionInfo, 295011779U) },
 	};
 	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo[] = {
-		{ Z_Construct_UClass_UCustomMoveComponent, UCustomMoveComponent::StaticClass, TEXT("UCustomMoveComponent"), &Z_Registration_Info_UClass_UCustomMoveComponent, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UCustomMoveComponent), 601724201U) },
+		{ Z_Construct_UClass_UCustomMoveComponent, UCustomMoveComponent::StaticClass, TEXT("UCustomMoveComponent"), &Z_Registration_Info_UClass_UCustomMoveComponent, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UCustomMoveComponent), 754151689U) },
 	};
-	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_4035397605(TEXT("/Script/NewCppTutorial"),
+	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_3201953840(TEXT("/Script/NewCppTutorial"),
 		Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo),
 		nullptr, 0,
 		Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::EnumInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::EnumInfo));
