@@ -833,66 +833,36 @@ void UCustomMoveComponent::PhysWallRun(float deltaTime, int32 Iterations)
 
 		//General Params  for line trace implementation
 		FVector Start = UpdatedComponent->GetComponentLocation();
-		//FVector CastDelta = Velocity.GetSafeNormal().RotateAngleAxis(90, FVector::UpVector) * CapR()* 2;
 		FVector CastDelta = UpdatedComponent->GetRightVector() * CapR()* 2;
 		FVector End = safe_bWallRunRight ? Start + CastDelta : Start - CastDelta;
 		auto Params = CustomCharacterOwner->GetIgnoreCharacterParams();
 		FHitResult WallHit;
+		float prevSpeed = FVector(Velocity.X, Velocity.Y, 0).Size();
+		float useSpeed = prevSpeed < MinWallRunSpeed ? MinWallRunSpeed : prevSpeed;
 
 		GetWorld()->LineTraceSingleByProfile(WallHit, Start, End, "BlockAll", Params);
-		DrawDebugLine(GetWorld(), Start, End, FColor::Green, true, 0, 0);
 
-
-#pragma endregion
-
-#pragma region SweepWallDetect
-
-		/*
-
-		FHitResult WallHit;
-		FCollisionShape StructureCollision;
-		FVector Start = UpdatedComponent->GetComponentLocation();
-		StructureCollision = CustomCharacterOwner->GetWallRunScanMesh();
-		FVector CastDelta = Velocity.GetSafeNormal2D().RotateAngleAxis(90, FVector::UpVector) * WallRunScanDistance * 1.5;
-
-		//DrawDebugLine(GetWorld(), Start,Start + CastDelta * 100, FColor::Cyan, true, 0, 0);
-		//DrawDebugLine(GetWorld(), Start,Start - CastDelta * 100, FColor::Blue, true, 0, 0);
-		if (safe_bWallRunRight) {
-			GetWorld()->SweepSingleByProfile(WallHit, Start, Start + CastDelta, UpdatedComponent->GetComponentQuat(), "BlockAll", StructureCollision, CustomCharacterOwner->GetIgnoreCharacterParams());
-		}
-		else {
-			GetWorld()->SweepSingleByProfile(WallHit, Start, Start - CastDelta, UpdatedComponent->GetComponentQuat(), "BlockAll", StructureCollision, CustomCharacterOwner->GetIgnoreCharacterParams());
-		}
-		
-		*/
-
-#pragma endregion
-
-		FVector MoveDirection(WallHit.Normal.X, WallHit.Normal.Y, WallHit.Normal.Z);
-		if (MoveDirection == FVector(0, 0, 0)) {
-			UE_LOG(LogTemp, Warning, TEXT("Bug 2")); 
-			Velocity.RotateAngleAxis(45, FVector::UpVector);
-			SetMovementMode(MOVE_Falling); 
+		if (!WallHit.bBlockingHit || !Cast<AWallRunWall>(WallHit.GetActor())) {
+			UE_LOG(LogTemp, Warning, TEXT("Bad Wall"))
+			SetMovementMode(MOVE_Falling);
+			RemainingTime += timeTick;
 			StartNewPhysics(RemainingTime, Iterations);
 			return;
 		}
 
-		if (safe_bWallRunRight) {
-			Velocity = MoveDirection.RotateAngleAxis(90, FVector::UpVector) * FVector(Velocity.X,Velocity.Y,0).Length();
-			//UE_LOG(LogTemp, Warning, TEXT("Right"))
-		}
-		else {
-			Velocity = MoveDirection.RotateAngleAxis(270, FVector::UpVector) * FVector(Velocity.X, Velocity.Y, 0).Length();
-			//UE_LOG(LogTemp, Warning, TEXT("Left"))
-		}
-		
 
-		//For WallRuns That Can Change Z Height
-		//if you are holding in the direction you are wall running, no gravity is applied, if you are holding in no direction or away, the ngravity starts to build
+#pragma endregion
 
-		float TangentAccel = Acceleration.GetSafeNormal() | Velocity.GetSafeNormal2D();
-		bool bVelUp = Velocity.Z > 0.f;
-		//Velocity.Z += GetGravityZ() * WallRunGravityScaleCurve->GetFloatValue(bVelUp ? 0.f : TangentAccel) * timeTick;
+		FVector wallNormalFlat = FVector(WallHit.ImpactNormal.X, WallHit.ImpactNormal.Y, 0);
+		FVector MoveDirection = safe_bWallRunRight ? wallNormalFlat.RotateAngleAxis(90, FVector::UpVector) : wallNormalFlat.RotateAngleAxis(270, FVector::UpVector);
+		if (MoveDirection == FVector(0, 0, 0)) {
+			UE_LOG(LogTemp, Warning, TEXT("Bug 2")); 
+			Velocity.RotateAngleAxis(45, FVector::UpVector);
+			SetMovementMode(MOVE_Falling); 
+			RemainingTime = +timeTick;
+			StartNewPhysics(RemainingTime, Iterations);
+			return;
+		}
 
 		//If min or max speeds are exceeded end wall run
 		if (SpeedCheck()) {
@@ -902,27 +872,52 @@ void UCustomMoveComponent::PhysWallRun(float deltaTime, int32 Iterations)
 		}
 
 		//ComputeMoveParameters
-		const FVector Delta = timeTick * Velocity;
+		const FVector Delta = (timeTick * useSpeed) * MoveDirection;
 		const bool bZeroDelta = Delta.IsNearlyZero();
 		if (bZeroDelta) {
 			RemainingTime = 0.f;
 		}
 		else
 		{
-			FHitResult WallAttractionHit;
 			FHitResult WallRunHit;
+
 			SafeMoveUpdatedComponent(Delta, UpdatedComponent->GetComponentQuat(), true, WallRunHit);
-			FVector WallAttractionDelta = -WallHit.Normal * WallAttractionForce * timeTick;
-			SafeMoveUpdatedComponent(WallAttractionDelta, Velocity.GetSafeNormal2D().Rotation().Quaternion(), true, WallAttractionHit);
 
 			if (WallRunHit.IsValidBlockingHit()) {
+				UE_LOG(LogTemp, Warning, TEXT("WallRunHitDetected"))
+
+				FVector hitNormal =  WallRunHit.ImpactPoint + (WallRunHit.ImpactNormal * 10);
+				DrawDebugLine(GetWorld(), WallRunHit.ImpactPoint, hitNormal , FColor::Red, true);
+
 				HandleImpact(WallRunHit, timeTick, Delta);
-				SlideAlongSurface(Delta, 1.f-WallRunHit.Time, WallRunHit.Normal, WallRunHit, true);
+				//SlideAlongSurface(Delta, 1.f-WallRunHit.Time, WallRunHit.Normal, WallRunHit, true);
+				FVector slideDelta = ComputeSlideVector(Delta, 1.f - WallRunHit.Time, WallRunHit.Normal, WallRunHit);
+				FVector slideLocation = WallRunHit.Location + slideDelta;
+				FRotator slideRotation = UKismetMathLibrary::MakeRotFromXZ(slideDelta, FVector::UpVector);
+				UpdatedComponent->SetWorldRotation(slideRotation);
+				UpdatedComponent->SetWorldLocation(slideLocation);
+				Velocity = slideDelta.GetSafeNormal2D() * prevSpeed;
 			}
+			else {
+				FVector FinalAdjustDelta = safe_bWallRunRight ? (UpdatedComponent->GetRightVector() * CapR()) + (UpdatedComponent->GetRightVector() * 10) : (-UpdatedComponent->GetRightVector() * CapR()) - (UpdatedComponent->GetRightVector()*10);
+
+				FVector start2 = UpdatedComponent->GetComponentLocation();
+				GetWorld()->LineTraceSingleByProfile(WallHit, start2, start2 + FinalAdjustDelta, "BlockAll", Params);
+				
+
+				if (WallHit.bBlockingHit && Cast<AWallRunWall>(WallHit.GetActor())) {
+					FVector finalLocation = WallHit.ImpactPoint + (WallHit.ImpactNormal * CapR());
+					FVector finalForward = safe_bWallRunRight ? WallHit.ImpactNormal.RotateAngleAxis(90, FVector::UpVector) : WallHit.ImpactNormal.RotateAngleAxis(270, FVector::UpVector);
+					FRotator finalRotation = UKismetMathLibrary::MakeRotFromXZ(finalForward, FVector::UpVector);
+					UpdatedComponent->SetWorldLocation(finalLocation);
+					UpdatedComponent->SetWorldRotation(finalRotation);
+					Velocity = finalForward * prevSpeed;
+
+				}
+			}
+
+
 		}
-
-		//implement slide along
-
 
 		if (UpdatedComponent->GetComponentLocation() == OldLocation) {
 			UE_LOG(LogTemp, Warning, TEXT("No Movement Break"))
@@ -937,48 +932,6 @@ void UCustomMoveComponent::PhysWallRun(float deltaTime, int32 Iterations)
 		//DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + Velocity * 100, FColor::Green, false, 1 / 60, 10, 1.25);
 		if (Velocity.Size() == 0)UE_LOG(LogTemp, Warning, TEXT("Zero velocity"));
 	}
-
-	//make sure all wall run requirements are still met
-#pragma region LineTraceParamCheck
-
-	
-
-	FVector Start = UpdatedComponent->GetComponentLocation();
-	FVector CastDelta = Velocity.GetSafeNormal().RotateAngleAxis(90, FVector::UpVector) * CapR() * 2;
-	FVector End = safe_bWallRunRight ? Start + CastDelta : Start - CastDelta;
-	auto Params = CustomCharacterOwner->GetIgnoreCharacterParams();
-	FHitResult FloorHit, WallHit2;
-	GetWorld()->LineTraceSingleByProfile(WallHit2, Start, End, "BlockAll", Params);
-	if (!WallHit2.IsValidBlockingHit())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("wall hit error"))
-		SetMovementMode(MOVE_Falling);
-	}
-
-	
-
-#pragma endregion
-
-#pragma region SweepParamCheck
-
-	/*
-
-	FHitResult WallHit;
-	FCollisionShape StructureCollision;
-	FVector Start = UpdatedComponent->GetComponentLocation();
-	StructureCollision = CustomCharacterOwner->GetWallRunScanMesh();
-	FVector CastDelta = Velocity.GetSafeNormal2D().RotateAngleAxis(90, FVector::UpVector) * WallRunScanDistance * 1.5;
-	if (safe_bWallRunRight) {
-		GetWorld()->SweepSingleByProfile(WallHit, Start, Start + CastDelta, UpdatedComponent->GetComponentQuat(), "BlockAll", StructureCollision, CustomCharacterOwner->GetIgnoreCharacterParams());
-	}
-	else {
-		GetWorld()->SweepSingleByProfile(WallHit, Start, Start - CastDelta, UpdatedComponent->GetComponentQuat(), "BlockAll", StructureCollision, CustomCharacterOwner->GetIgnoreCharacterParams());
-	}
-
-	*/
-
-#pragma endregion
-
 
 }
 
