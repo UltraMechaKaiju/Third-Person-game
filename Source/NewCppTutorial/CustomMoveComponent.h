@@ -60,17 +60,22 @@ class NEWCPPTUTORIAL_API UCustomMoveComponent : public UCharacterMovementCompone
 	UPROPERTY(EditDefaultsOnly) float Sprint_MaxSpeed = 1200;
 	UPROPERTY(EditDefaultsOnly) float Walk_MaxSpeed = 600;
 
-	//wallRun Params
-	UPROPERTY(EditDefaultsOnly) float WallRunScanDistance = 25.f;
 
-	UPROPERTY(EditDefaultsOnly) float MinWallRunSpeed = 200.f;
-	UPROPERTY(EditDefaultsOnly) float MaxWallRunSpeed = 800.f;
-	UPROPERTY(EditDefaultsOnly) float MaxVerticalRunSpeed = 200.f;
-	UPROPERTY(EditDefaultsOnly) float WallRunPullAwayAngle = 75;
-	UPROPERTY(EditDefaultsOnly) float MinWallRunHeight = 50.f;
-	UPROPERTY(EditDefaultsOnly) float WallJumpOffForce = 200.f;
-	UPROPERTY(EditDefaultsOnly) float WallAttractionForce = 1000.f;
-	UPROPERTY(EditDefaultsOnly) UCurveFloat* WallRunGravityScaleCurve;
+
+
+	UPROPERTY(EditDefaultsOnly) float GMTurnRate = 100;
+	UPROPERTY(EditDefaultsOnly) float GMRateOfAccel = 10;
+	UPROPERTY(EditDefaultsOnly) float GMRateOfDecel = 25;
+	UPROPERTY(EditDefaultsOnly) float GMMaxSpeed = 800;
+	UPROPERTY(EditDefaultsOnly) float DecelAreaSizeRad = FMath::DegreesToRadians(45);
+
+	//wallRun Params
+	UPROPERTY(EditDefaultsOnly) float WRScanDistance = 25.f;
+
+	UPROPERTY(EditDefaultsOnly) float WRMinSpeed = 200.f;
+	UPROPERTY(EditDefaultsOnly) float WRMaxSpeed = 800.f;
+	UPROPERTY(EditDefaultsOnly) float WRPullAwayAngle = 75;
+	UPROPERTY(EditDefaultsOnly) float WRMinHeight = 50.f;
 	UPROPERTY(EditDefaultsOnly) int WRMinLeaveAngle = 20;
 	UPROPERTY(EditDefaultsOnly) int WRMaxLeaveAngle = 80;
 
@@ -82,10 +87,7 @@ class NEWCPPTUTORIAL_API UCustomMoveComponent : public UCharacterMovementCompone
 	UPROPERTY(EditDefaultsOnly) float RGCorrectionAllowance = FMath::DegreesToRadians(45);
 	UPROPERTY(EditDefaultsOnly) float RGSignificantLeanThreshold = FMath::DegreesToRadians(10);/*How far the player has to be leaning to one side or the other to be considered leaning*/
 	UPROPERTY(EditDefaultsOnly) float RGMinSpeed = 100;
-
-	//DEBUG ONLY
-
-	float RGPrevDist;
+	UPROPERTY(EditDefaultsOnly) bool RGUseCorrectionRads = false;
 
 
 	//client side Flags

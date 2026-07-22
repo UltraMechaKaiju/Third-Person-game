@@ -10,7 +10,6 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 // Cross Module References
 	ENGINE_API UClass* Z_Construct_UClass_UCharacterMovementComponent();
-	ENGINE_API UClass* Z_Construct_UClass_UCurveFloat_NoRegister();
 	NEWCPPTUTORIAL_API UClass* Z_Construct_UClass_AXpCharacter_NoRegister();
 	NEWCPPTUTORIAL_API UClass* Z_Construct_UClass_UCustomMoveComponent();
 	NEWCPPTUTORIAL_API UClass* Z_Construct_UClass_UCustomMoveComponent_NoRegister();
@@ -413,41 +412,45 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 #endif
 		static const UECodeGen_Private::FFloatPropertyParams NewProp_Walk_MaxSpeed;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_WallRunScanDistance_MetaData[];
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_GMTurnRate_MetaData[];
 #endif
-		static const UECodeGen_Private::FFloatPropertyParams NewProp_WallRunScanDistance;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_GMTurnRate;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_MinWallRunSpeed_MetaData[];
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_GMRateOfAccel_MetaData[];
 #endif
-		static const UECodeGen_Private::FFloatPropertyParams NewProp_MinWallRunSpeed;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_GMRateOfAccel;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_MaxWallRunSpeed_MetaData[];
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_GMRateOfDecel_MetaData[];
 #endif
-		static const UECodeGen_Private::FFloatPropertyParams NewProp_MaxWallRunSpeed;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_GMRateOfDecel;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_MaxVerticalRunSpeed_MetaData[];
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_GMMaxSpeed_MetaData[];
 #endif
-		static const UECodeGen_Private::FFloatPropertyParams NewProp_MaxVerticalRunSpeed;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_GMMaxSpeed;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_WallRunPullAwayAngle_MetaData[];
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_DecelAreaSizeRad_MetaData[];
 #endif
-		static const UECodeGen_Private::FFloatPropertyParams NewProp_WallRunPullAwayAngle;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_DecelAreaSizeRad;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_MinWallRunHeight_MetaData[];
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_WRScanDistance_MetaData[];
 #endif
-		static const UECodeGen_Private::FFloatPropertyParams NewProp_MinWallRunHeight;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_WRScanDistance;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_WallJumpOffForce_MetaData[];
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_WRMinSpeed_MetaData[];
 #endif
-		static const UECodeGen_Private::FFloatPropertyParams NewProp_WallJumpOffForce;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_WRMinSpeed;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_WallAttractionForce_MetaData[];
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_WRMaxSpeed_MetaData[];
 #endif
-		static const UECodeGen_Private::FFloatPropertyParams NewProp_WallAttractionForce;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_WRMaxSpeed;
 #if WITH_METADATA
-		static const UECodeGen_Private::FMetaDataPairParam NewProp_WallRunGravityScaleCurve_MetaData[];
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_WRPullAwayAngle_MetaData[];
 #endif
-		static const UECodeGen_Private::FObjectPropertyParams NewProp_WallRunGravityScaleCurve;
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_WRPullAwayAngle;
+#if WITH_METADATA
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_WRMinHeight_MetaData[];
+#endif
+		static const UECodeGen_Private::FFloatPropertyParams NewProp_WRMinHeight;
 #if WITH_METADATA
 		static const UECodeGen_Private::FMetaDataPairParam NewProp_WRMinLeaveAngle_MetaData[];
 #endif
@@ -484,6 +487,11 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 		static const UECodeGen_Private::FMetaDataPairParam NewProp_RGMinSpeed_MetaData[];
 #endif
 		static const UECodeGen_Private::FFloatPropertyParams NewProp_RGMinSpeed;
+#if WITH_METADATA
+		static const UECodeGen_Private::FMetaDataPairParam NewProp_RGUseCorrectionRads_MetaData[];
+#endif
+		static void NewProp_RGUseCorrectionRads_SetBit(void* Obj);
+		static const UECodeGen_Private::FBoolPropertyParams NewProp_RGUseCorrectionRads;
 #if WITH_METADATA
 		static const UECodeGen_Private::FMetaDataPairParam NewProp_CustomCharacterOwner_MetaData[];
 #endif
@@ -532,7 +540,42 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 #endif
 	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_Walk_MaxSpeed = { "Walk_MaxSpeed", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, Walk_MaxSpeed), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_Walk_MaxSpeed_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_Walk_MaxSpeed_MetaData) };
 #if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunScanDistance_MetaData[] = {
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMTurnRate_MetaData[] = {
+		{ "Category", "CustomMoveComponent" },
+		{ "ModuleRelativePath", "CustomMoveComponent.h" },
+	};
+#endif
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMTurnRate = { "GMTurnRate", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, GMTurnRate), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMTurnRate_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMTurnRate_MetaData) };
+#if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMRateOfAccel_MetaData[] = {
+		{ "Category", "CustomMoveComponent" },
+		{ "ModuleRelativePath", "CustomMoveComponent.h" },
+	};
+#endif
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMRateOfAccel = { "GMRateOfAccel", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, GMRateOfAccel), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMRateOfAccel_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMRateOfAccel_MetaData) };
+#if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMRateOfDecel_MetaData[] = {
+		{ "Category", "CustomMoveComponent" },
+		{ "ModuleRelativePath", "CustomMoveComponent.h" },
+	};
+#endif
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMRateOfDecel = { "GMRateOfDecel", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, GMRateOfDecel), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMRateOfDecel_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMRateOfDecel_MetaData) };
+#if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMMaxSpeed_MetaData[] = {
+		{ "Category", "CustomMoveComponent" },
+		{ "ModuleRelativePath", "CustomMoveComponent.h" },
+	};
+#endif
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMMaxSpeed = { "GMMaxSpeed", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, GMMaxSpeed), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMMaxSpeed_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMMaxSpeed_MetaData) };
+#if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_DecelAreaSizeRad_MetaData[] = {
+		{ "Category", "CustomMoveComponent" },
+		{ "ModuleRelativePath", "CustomMoveComponent.h" },
+	};
+#endif
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_DecelAreaSizeRad = { "DecelAreaSizeRad", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, DecelAreaSizeRad), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_DecelAreaSizeRad_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_DecelAreaSizeRad_MetaData) };
+#if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRScanDistance_MetaData[] = {
 		{ "Category", "CustomMoveComponent" },
 #if !UE_BUILD_SHIPPING
 		{ "Comment", "//wallRun Params\n" },
@@ -543,63 +586,35 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 #endif
 	};
 #endif
-	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunScanDistance = { "WallRunScanDistance", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, WallRunScanDistance), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunScanDistance_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunScanDistance_MetaData) };
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRScanDistance = { "WRScanDistance", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, WRScanDistance), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRScanDistance_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRScanDistance_MetaData) };
 #if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MinWallRunSpeed_MetaData[] = {
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinSpeed_MetaData[] = {
 		{ "Category", "CustomMoveComponent" },
 		{ "ModuleRelativePath", "CustomMoveComponent.h" },
 	};
 #endif
-	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MinWallRunSpeed = { "MinWallRunSpeed", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, MinWallRunSpeed), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MinWallRunSpeed_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MinWallRunSpeed_MetaData) };
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinSpeed = { "WRMinSpeed", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, WRMinSpeed), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinSpeed_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinSpeed_MetaData) };
 #if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MaxWallRunSpeed_MetaData[] = {
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMaxSpeed_MetaData[] = {
 		{ "Category", "CustomMoveComponent" },
 		{ "ModuleRelativePath", "CustomMoveComponent.h" },
 	};
 #endif
-	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MaxWallRunSpeed = { "MaxWallRunSpeed", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, MaxWallRunSpeed), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MaxWallRunSpeed_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MaxWallRunSpeed_MetaData) };
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMaxSpeed = { "WRMaxSpeed", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, WRMaxSpeed), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMaxSpeed_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMaxSpeed_MetaData) };
 #if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MaxVerticalRunSpeed_MetaData[] = {
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRPullAwayAngle_MetaData[] = {
 		{ "Category", "CustomMoveComponent" },
 		{ "ModuleRelativePath", "CustomMoveComponent.h" },
 	};
 #endif
-	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MaxVerticalRunSpeed = { "MaxVerticalRunSpeed", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, MaxVerticalRunSpeed), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MaxVerticalRunSpeed_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MaxVerticalRunSpeed_MetaData) };
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRPullAwayAngle = { "WRPullAwayAngle", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, WRPullAwayAngle), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRPullAwayAngle_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRPullAwayAngle_MetaData) };
 #if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunPullAwayAngle_MetaData[] = {
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinHeight_MetaData[] = {
 		{ "Category", "CustomMoveComponent" },
 		{ "ModuleRelativePath", "CustomMoveComponent.h" },
 	};
 #endif
-	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunPullAwayAngle = { "WallRunPullAwayAngle", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, WallRunPullAwayAngle), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunPullAwayAngle_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunPullAwayAngle_MetaData) };
-#if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MinWallRunHeight_MetaData[] = {
-		{ "Category", "CustomMoveComponent" },
-		{ "ModuleRelativePath", "CustomMoveComponent.h" },
-	};
-#endif
-	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MinWallRunHeight = { "MinWallRunHeight", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, MinWallRunHeight), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MinWallRunHeight_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MinWallRunHeight_MetaData) };
-#if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallJumpOffForce_MetaData[] = {
-		{ "Category", "CustomMoveComponent" },
-		{ "ModuleRelativePath", "CustomMoveComponent.h" },
-	};
-#endif
-	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallJumpOffForce = { "WallJumpOffForce", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, WallJumpOffForce), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallJumpOffForce_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallJumpOffForce_MetaData) };
-#if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallAttractionForce_MetaData[] = {
-		{ "Category", "CustomMoveComponent" },
-		{ "ModuleRelativePath", "CustomMoveComponent.h" },
-	};
-#endif
-	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallAttractionForce = { "WallAttractionForce", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, WallAttractionForce), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallAttractionForce_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallAttractionForce_MetaData) };
-#if WITH_METADATA
-	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve_MetaData[] = {
-		{ "Category", "CustomMoveComponent" },
-		{ "ModuleRelativePath", "CustomMoveComponent.h" },
-	};
-#endif
-	const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve = { "WallRunGravityScaleCurve", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, WallRunGravityScaleCurve), Z_Construct_UClass_UCurveFloat_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve_MetaData) };
+	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinHeight = { "WRMinHeight", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, WRMinHeight), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinHeight_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinHeight_MetaData) };
 #if WITH_METADATA
 	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinLeaveAngle_MetaData[] = {
 		{ "Category", "CustomMoveComponent" },
@@ -688,6 +703,17 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 #endif
 	const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMinSpeed = { "RGMinSpeed", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(UCustomMoveComponent, RGMinSpeed), METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMinSpeed_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMinSpeed_MetaData) };
 #if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGUseCorrectionRads_MetaData[] = {
+		{ "Category", "CustomMoveComponent" },
+		{ "ModuleRelativePath", "CustomMoveComponent.h" },
+	};
+#endif
+	void Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGUseCorrectionRads_SetBit(void* Obj)
+	{
+		((UCustomMoveComponent*)Obj)->RGUseCorrectionRads = 1;
+	}
+	const UECodeGen_Private::FBoolPropertyParams Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGUseCorrectionRads = { "RGUseCorrectionRads", nullptr, (EPropertyFlags)0x0040000000010001, UECodeGen_Private::EPropertyGenFlags::Bool | UECodeGen_Private::EPropertyGenFlags::NativeBool, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, sizeof(bool), sizeof(UCustomMoveComponent), &Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGUseCorrectionRads_SetBit, METADATA_PARAMS(UE_ARRAY_COUNT(Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGUseCorrectionRads_MetaData), Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGUseCorrectionRads_MetaData) };
+#if WITH_METADATA
 	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_CustomCharacterOwner_MetaData[] = {
 		{ "ModuleRelativePath", "CustomMoveComponent.h" },
 	};
@@ -703,15 +729,16 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 	const UECodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_UCustomMoveComponent_Statics::PropPointers[] = {
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_Sprint_MaxSpeed,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_Walk_MaxSpeed,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunScanDistance,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MinWallRunSpeed,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MaxWallRunSpeed,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MaxVerticalRunSpeed,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunPullAwayAngle,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_MinWallRunHeight,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallJumpOffForce,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallAttractionForce,
-		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WallRunGravityScaleCurve,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMTurnRate,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMRateOfAccel,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMRateOfDecel,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_GMMaxSpeed,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_DecelAreaSizeRad,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRScanDistance,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinSpeed,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMaxSpeed,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRPullAwayAngle,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinHeight,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMinLeaveAngle,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_WRMaxLeaveAngle,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGPullAwayAngleMax,
@@ -721,6 +748,7 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGCorrectionAllowance,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGSignificantLeanThreshold,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGMinSpeed,
+		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_RGUseCorrectionRads,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_CustomCharacterOwner,
 		(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_UCustomMoveComponent_Statics::NewProp_skateGravity,
 	};
@@ -766,9 +794,9 @@ void EmptyLinkFunctionForGeneratedCodeCustomMoveComponent() {}
 		{ ECustomMovementMode_StaticEnum, TEXT("ECustomMovementMode"), &Z_Registration_Info_UEnum_ECustomMovementMode, CONSTRUCT_RELOAD_VERSION_INFO(FEnumReloadVersionInfo, 295011779U) },
 	};
 	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo[] = {
-		{ Z_Construct_UClass_UCustomMoveComponent, UCustomMoveComponent::StaticClass, TEXT("UCustomMoveComponent"), &Z_Registration_Info_UClass_UCustomMoveComponent, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UCustomMoveComponent), 754151689U) },
+		{ Z_Construct_UClass_UCustomMoveComponent, UCustomMoveComponent::StaticClass, TEXT("UCustomMoveComponent"), &Z_Registration_Info_UClass_UCustomMoveComponent, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UCustomMoveComponent), 1393268845U) },
 	};
-	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_3201953840(TEXT("/Script/NewCppTutorial"),
+	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_1611291560(TEXT("/Script/NewCppTutorial"),
 		Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::ClassInfo),
 		nullptr, 0,
 		Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::EnumInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Unreal_engine_NewCppTutorial_Source_NewCppTutorial_CustomMoveComponent_h_Statics::EnumInfo));

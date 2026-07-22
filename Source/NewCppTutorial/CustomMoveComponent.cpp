@@ -148,7 +148,7 @@ float UCustomMoveComponent::GetMaxSpeed() const
 	switch (CustomMovementMode)
 	{
 	case CMOVE_WallRun:
-		return MaxWallRunSpeed;
+		return WRMaxSpeed;
 	case CMOVE_RailGrind:
 		return 0;
 	default:
@@ -263,7 +263,7 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 				useMaxLeaveRad = RGMaxLeaveRadians;
 				useCorrectionRad = RGCorrectionAllowance;
 			}
-			AccelAcceptable = DegreeDifVectorsRad(AcceptableAreaCenterLine, desiredLeaveDir) < useMaxLeaveRad + useCorrectionRad;
+			AccelAcceptable = DegreeDifVectorsRad(AcceptableAreaCenterLine, desiredLeaveDir) < useMaxLeaveRad + useCorrectionRad || !RGUseCorrectionRads;
 		}
 
 		if(AccelAcceptable){/*Player Is trying to choose their leave direction on a normal rail and their direction chosen can be used*/
@@ -272,9 +272,10 @@ bool UCustomMoveComponent::DoJump(bool bReplayingMoves)
 				RailJumpDir = desiredLeaveDir;
 			}
 			else {/*Acceptable with correction*/
-				FVector rightExtreme = AcceptableAreaCenterLine.RotateAngleAxisRad(useMaxLeaveRad, FVector::UpVector);
-				bool correctRight = DegreeDifVectorsRad(rightExtreme, desiredLeaveDir) <= RGCorrectionAllowance;
+				FVector relativeRight = AcceptableAreaCenterLine.RotateAngleAxisRad(90, FVector::UpVector);
+				bool correctRight = DegreeDifVectorsRad(relativeRight, desiredLeaveDir) <= PI/2;
 				if (correctRight) {/*Jump to the right extreme*/
+					FVector rightExtreme = AcceptableAreaCenterLine.RotateAngleAxisRad(useMaxLeaveRad, FVector::UpVector);
 					RailJumpDir = rightExtreme;
 				}
 				else {/*Jump to left extreme*/
@@ -422,7 +423,7 @@ bool UCustomMoveComponent::TryWallRun()
 {
 	//initial Checks
 	if (!IsFalling()) return false;
-	//if (Velocity.GetSafeNormal2D().Length() < MinWallRunSpeed) {return false;}
+	//if (Velocity.GetSafeNormal2D().Length() < WRMinSpeed) {return false;}
 	//if (Velocity.Z < -MaxVerticalRunSpeed) return false;
 	FHitResult WallRunWall;
 
@@ -610,7 +611,7 @@ bool UCustomMoveComponent::TryWallRun()
 	FHitResult LeftScan;
 	FCollisionShape StructureCollision;
 	StructureCollision = CustomCharacterOwner->GetWallRunScanMesh();
-	FVector End = Velocity.GetSafeNormal2D().RotateAngleAxis(90, UpdatedComponent->GetUpVector()) * WallRunScanDistance;
+	FVector End = Velocity.GetSafeNormal2D().RotateAngleAxis(90, UpdatedComponent->GetUpVector()) * WRScanDistance;
 
 	GetWorld()->SweepSingleByProfile(RightScan, UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + End, UpdatedComponent->GetComponentQuat(), "BlockAll", StructureCollision, CustomCharacterOwner->GetIgnoreCharacterParams());
 	GetWorld()->SweepSingleByProfile(LeftScan, UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() - End, UpdatedComponent->GetComponentQuat(), "BlockAll", StructureCollision, CustomCharacterOwner->GetIgnoreCharacterParams());
@@ -690,7 +691,7 @@ bool UCustomMoveComponent::TryRailGrind(){
 
 
 bool UCustomMoveComponent::SpeedCheck() {
-	//if (Velocity.SizeSquared() < pow(MinWallRunSpeed, 2)/* || Velocity.Z < -MaxVerticalRunSpeed*/)
+	//if (Velocity.SizeSquared() < pow(WRMinSpeed, 2)/* || Velocity.Z < -MaxVerticalRunSpeed*/)
 	if (Velocity.IsNearlyZero())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Speed Exit"))
@@ -724,7 +725,7 @@ bool UCustomMoveComponent::TryWallRunImp1(FHitResult Storedhit)
 	FVector RightEnd = Start + UpdatedComponent->GetRightVector() * 34.f * 2;
 	auto Params = CustomCharacterOwner->GetIgnoreCharacterParams();
 	FHitResult FloorHit;
-	if (GetWorld()->LineTraceSingleByProfile(FloorHit, Start, Start + FVector::DownVector * (84.f + MinWallRunHeight), "BlockAll", Params)) {
+	if (GetWorld()->LineTraceSingleByProfile(FloorHit, Start, Start + FVector::DownVector * (84.f + WRMinHeight), "BlockAll", Params)) {
 		return false;
 	}
 
@@ -858,7 +859,7 @@ void UCustomMoveComponent::PhysWallRun(float deltaTime, int32 Iterations)
 		auto Params = CustomCharacterOwner->GetIgnoreCharacterParams();
 		FHitResult WallHit;
 		float prevSpeed = FVector(Velocity.X, Velocity.Y, 0).Size();
-		float useSpeed = prevSpeed < MinWallRunSpeed ? MinWallRunSpeed : prevSpeed;
+		float useSpeed = prevSpeed < WRMinSpeed ? WRMinSpeed : prevSpeed;
 
 		GetWorld()->LineTraceSingleByProfile(WallHit, Start, End, "BlockAll", Params);
 
@@ -997,9 +998,6 @@ void UCustomMoveComponent::PhysRailGrind(float deltaTime, int32 Iterations)
 		//Define Variables
 		SelectedSpline = SelectedRail->GrindRail;
 		SelectedRailDistAlongStart = Safe_GrindRailDistAlong;
-
-		//debug only
-		if (RGPrevDist != SelectedRailDistAlongStart && RGPrevDist != NULL) { float DistDelta = RGPrevDist - SelectedRailDistAlongStart; UE_LOG(LogTemp, Warning, TEXT("Dist Not Match: %f"), DistDelta); }
 
 		SplineEndDistance = SelectedSpline->GetSplineLength();
 		//RailHasBeen Selected
@@ -1173,76 +1171,43 @@ void UCustomMoveComponent::PhysWalking(float deltaTime, int32 Iterations)
 
 		RestorePreAdditiveRootMotionVelocity();
 
-		// Ensure velocity is horizontal.
+		// custom turn and move.
 		MaintainHorizontalGroundVelocity();
 		const FVector OldVelocity = Velocity;
-		Acceleration = FVector::VectorPlaneProject(Acceleration, -FVector(0.f, 0.f, -1.f));
-		float RateOfAcceleration = 10 * timeTick;
+		FVector curForward = UpdatedComponent->GetForwardVector();
+		FVector turnedForward = curForward;
+		FVector desiredDir = Acceleration.GetSafeNormal();
+		float prevSpeed = FVector(Velocity.X, Velocity.Y, 0).Size();
+		float useSpeed = prevSpeed;
+		bool Decel = DegreeDifVectorsRad(-UpdatedComponent->GetForwardVector(), desiredDir) <= DecelAreaSizeRad && Acceleration.Size() != 0;
+		useSpeed = Decel ? (prevSpeed > GMRateOfDecel ? prevSpeed - GMRateOfDecel : 0) : useSpeed;
 
 		// Apply acceleration
 		if (!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
 		{
+			//if (Acceleration.Size() != 0) { UE_LOG(LogTemp, Warning, TEXT(" vel")) }
+			if (!Decel && curForward != desiredDir && Acceleration.Size() != 0) {
+				useSpeed = FMath::Min(prevSpeed + GMRateOfAccel, GMMaxSpeed);
 
-			if (Acceleration != FVector(0, 0, 0) && Velocity == FVector(0,0,0)) {
-				//make this happen over time rather than instantly
-				Velocity += Acceleration.GetSafeNormal() * RateOfAcceleration;
-
-				//UE_LOG(LogTemp, Warning, TEXT("StartFromStop"))
-			}
-
-			if (Velocity.Size() < MaxCustomMovementSpeed && Velocity != FVector(0,0,0)) {
-				//make this happen over time rather than instantly
-				Velocity *= ((MaxCustomMovementSpeed / Velocity.Size())   );
-
-				//UE_LOG(LogTemp, Warning, TEXT("SpeedCorrected"))
-			}
-			
-			
-			if (Velocity.GetSafeNormal2D() != Acceleration.GetSafeNormal2D()) {
-
-					DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + Velocity.GetSafeNormal2D() * 150, FColor::Blue, false, 1 / 60, 1.5);
-					DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + Acceleration.GetSafeNormal2D() * 100, FColor::Red, false, 1 / 60, 2);
-
-
-				//Shoot out left and right Vectors
-				FVector LeftDirection = (FVector(Velocity.X, Velocity.Y, 0.f)).RotateAngleAxis(270, FVector::UpVector);
-				FVector RightDirection = (FVector(Velocity.X, Velocity.Y, 0.f)).RotateAngleAxis(90, FVector::UpVector);
-
-				float DotProduct = FVector::DotProduct(Acceleration.GetSafeNormal(), Velocity.GetSafeNormal());
-				float RadianDelta = FMath::Acos(DotProduct);
-				float DegreeDelta = FMath::RadiansToDegrees(RadianDelta);
-				float Turnrate = 100.f;
+				DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + Velocity.GetSafeNormal2D() * 150, FColor::Blue, false, 1 / 60, 1.5);
+				DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + Acceleration.GetSafeNormal2D() * 100, FColor::Red, false, 1 / 60, 2);
 				
-				float LeftDotProduct = FVector::DotProduct(Acceleration.GetSafeNormal(), LeftDirection.GetSafeNormal());
-				float LeftRadianDelta = FMath::Acos(LeftDotProduct);
+				FVector RightDirection = UpdatedComponent->GetRightVector();
 
-				float RightDotProduct = FVector::DotProduct(Acceleration.GetSafeNormal(), RightDirection.GetSafeNormal());
-				float RightRadianDelta = FMath::Acos(RightDotProduct);
+				float velAccRadianDelta = DegreeDifVectorsRad(desiredDir, curForward);
+				float velAccDegreeDelta = FMath::RadiansToDegrees(velAccRadianDelta);
 
+				bool turnRight = DegreeDifVectorsRad(RightDirection, desiredDir) < PI / 2;
 
-				if (DegreeDelta != 0 && Acceleration != FVector(0, 0, 0)) {
-
-					//UE_LOG(LogTemp, Warning, TEXT("CorrectionMade"))
-					if (DegreeDelta > Turnrate * timeTick) {
-						if (RightRadianDelta > LeftRadianDelta || RightRadianDelta == LeftRadianDelta) {
-							Velocity = Velocity.RotateAngleAxis(Turnrate * timeTick, FVector::DownVector);
-						}
-						if (RightRadianDelta < LeftRadianDelta) {
-							Velocity = Velocity.RotateAngleAxis(-Turnrate * timeTick, FVector::DownVector);
-						}	
-					}
-					else{
-
-						//UE_LOG(LogTemp, Warning, TEXT("Small Correct"))
-						if (RightRadianDelta > LeftRadianDelta || RightRadianDelta == LeftRadianDelta) {
-							Velocity = Velocity.RotateAngleAxis(DegreeDelta, FVector::DownVector);
-						}
-						if (RightRadianDelta < LeftRadianDelta) {
-							Velocity = Velocity.RotateAngleAxis(-DegreeDelta, FVector::DownVector);
-						}
-					}
+					
+				//UE_LOG(LogTemp, Warning, TEXT("CorrectionMade"))
+				if (velAccDegreeDelta > GMTurnRate * timeTick) {
+					turnedForward = curForward.RotateAngleAxis((turnRight ? -GMTurnRate : GMTurnRate) * timeTick, FVector::DownVector);
 				}
-				//else { UE_LOG(LogTemp, Warning, TEXT("No Correctionmade")) }
+				else {
+					//UE_LOG(LogTemp, Warning, TEXT("Small Correct"))
+					turnedForward = desiredDir;
+				}
 			}
 		}
 
@@ -1264,7 +1229,7 @@ void UCustomMoveComponent::PhysWalking(float deltaTime, int32 Iterations)
 		}
 
 		// Compute move parameters
-		const FVector MoveVelocity = Velocity;
+		const FVector MoveVelocity = turnedForward * useSpeed;
 		const FVector Delta = timeTick * MoveVelocity;
 		const bool bZeroDelta = Delta.IsNearlyZero();
 		FStepDownResult StepDownResult;
@@ -1277,8 +1242,9 @@ void UCustomMoveComponent::PhysWalking(float deltaTime, int32 Iterations)
 		{
 			// try to move forward
 			MoveAlongFloor(MoveVelocity, timeTick, &StepDownResult);
+			Velocity = MoveVelocity;
 
-			FRotator WalkRotation = UKismetMathLibrary::MakeRotFromXZ(Velocity, FVector::UpVector);
+			FRotator WalkRotation = UKismetMathLibrary::MakeRotFromXZ(turnedForward, FVector::UpVector);
 			UpdatedComponent->SetWorldRotation(WalkRotation);
 
 			if (IsFalling())
